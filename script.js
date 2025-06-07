@@ -32,7 +32,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
           <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
           <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
           <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
-          <li><strong>Total Annual CTC:</strong> ${formatINR(data.total_annual_ctc)}</li>
+          <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
         </ul>
       `;
     }
