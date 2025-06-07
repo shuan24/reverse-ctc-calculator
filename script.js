@@ -1,63 +1,46 @@
-// script.js
+document.getElementById("salaryForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("salaryForm");
-  const input = document.getElementById("netSalary");
-  const output = document.getElementById("output");
+  const desiredSalary = parseFloat(document.getElementById("desiredSalary").value);
+  const outputDiv = document.getElementById("output");
 
-  const formatINR = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  if (isNaN(desiredSalary) || desiredSalary <= 0) {
+    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid positive number.</p>`;
+    return;
+  }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
 
-    const salary = parseFloat(input.value.trim());
+  try {
+    const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ in_hand: desiredSalary })
+    });
 
-    output.innerHTML = ""; // Clear previous output
+    const data = await response.json();
 
-    if (isNaN(salary) || salary <= 0) {
-      output.innerHTML = `<div class="error">❌ Please enter a valid positive salary amount.</div>`;
-      return;
-    }
-
-    output.innerHTML = `<div class="loading">⏳ Calculating...</div>`;
-
-    try {
-      const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ net_salary: salary }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      output.innerHTML = `
-        <div class="result">
-          <h3>CTC Breakdown:</h3>
-          <ul>
-            <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_inhand)}</li>
-            <li><strong>Estimated Gross Salary (Monthly):</strong> ${formatINR(data.estimated_gross_monthly)}</li>
-            <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
-            <li><strong>Monthly EPF (Employee):</strong> ${formatINR(data.monthly_epf_employee)}</li>
-            <li><strong>Monthly EPF (Employer):</strong> ${formatINR(data.monthly_epf_employer)}</li>
-            <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
-            <li><strong>Estimated Annual CTC:</strong> <mark>${formatINR(data.estimated_annual_ctc)}</mark></li>
-          </ul>
-        </div>
+    if (data.error) {
+      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
+    } else {
+      outputDiv.innerHTML = `
+        <h3>Results</h3>
+        <ul class="result">
+          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(desiredSalary)}</li>
+          <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
+          <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
+          <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
+          <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
+          <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
+          <li><strong>Total Annual CTC:</strong> ${formatINR(data.total_annual_ctc)}</li>
+        </ul>
       `;
-    } catch (error) {
-      output.innerHTML = `<div class="error">❌ ${error.message}</div>`;
     }
-  });
+  } catch (error) {
+    outputDiv.innerHTML = `<p class="error">❌ Failed to connect to backend. Please try again later.</p>`;
+  }
 });
+
+function formatINR(amount) {
+  return '₹' + amount.toLocaleString('en-IN');
+}
