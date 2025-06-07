@@ -1,31 +1,63 @@
-async function calculateCTC() {
-  const salary = document.getElementById("netSalary").value;
+// script.js
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("salaryForm");
+  const input = document.getElementById("netSalary");
   const output = document.getElementById("output");
 
-  output.innerHTML = "Calculating...";
+  const formatINR = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
-  try {
-    const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ net_salary: parseFloat(salary) })
-    });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    if (!response.ok) throw new Error("Failed to fetch results.");
+    const salary = parseFloat(input.value.trim());
 
-    const result = await response.json();
+    output.innerHTML = ""; // Clear previous output
 
-    output.innerHTML = `
-      <h4>Results</h4>
-      <p><strong>Desired In-Hand (Monthly):</strong> ₹${result.desired_inhand}</p>
-      <p><strong>Gross Monthly Salary:</strong> ₹${result.estimated_gross_monthly}</p>
-      <p><strong>Monthly Income Tax:</strong> ₹${result.monthly_tax}</p>
-      <p><strong>Employee EPF:</strong> ₹${result.monthly_epf_employee}</p>
-      <p><strong>Employer EPF:</strong> ₹${result.monthly_epf_employer}</p>
-      <p><strong>Professional Tax:</strong> ₹${result.professional_tax}</p>
-      <p><strong>Total Annual CTC:</strong> ₹${result.estimated_annual_ctc}</p>
-    `;
-  } catch (error) {
-    output.innerHTML = "Error: " + error.message;
-  }
-}
+    if (isNaN(salary) || salary <= 0) {
+      output.innerHTML = `<div class="error">❌ Please enter a valid positive salary amount.</div>`;
+      return;
+    }
+
+    output.innerHTML = `<div class="loading">⏳ Calculating...</div>`;
+
+    try {
+      const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ net_salary: salary }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      output.innerHTML = `
+        <div class="result">
+          <h3>CTC Breakdown:</h3>
+          <ul>
+            <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_inhand)}</li>
+            <li><strong>Estimated Gross Salary (Monthly):</strong> ${formatINR(data.estimated_gross_monthly)}</li>
+            <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
+            <li><strong>Monthly EPF (Employee):</strong> ${formatINR(data.monthly_epf_employee)}</li>
+            <li><strong>Monthly EPF (Employer):</strong> ${formatINR(data.monthly_epf_employer)}</li>
+            <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
+            <li><strong>Estimated Annual CTC:</strong> <mark>${formatINR(data.estimated_annual_ctc)}</mark></li>
+          </ul>
+        </div>
+      `;
+    } catch (error) {
+      output.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+    }
+  });
+});
