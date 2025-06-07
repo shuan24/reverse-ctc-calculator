@@ -28,4 +28,8 @@ async function calculateCTC() {
   } catch (error) {
     output.innerHTML = "Error: " + error.message;
   }
+  if (salary <= 0) {
+  output.innerHTML = "❌ Please enter a valid positive salary amount.";
+  return;
+}
 }
