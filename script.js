@@ -41,6 +41,11 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
   }
 });
 
+// Format currency in Indian style with rupee symbol
 function formatINR(amount) {
-  return '₹' + amount.toLocaleString('en-IN');
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0
+  }).format(amount);
 }
