@@ -1,54 +1,283 @@
+/* Google Fonts & Base Styling */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f9f9f9;
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+}
+
+h1, h3 {
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+}
+
+form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+button {
+  background: #007bff;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+#output {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+/* Result List Formatting */
+.result ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.result li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.result li strong {
+  flex-basis: 60%;
+  font-weight: 600;
+}
+
+.result li:last-child {
+  border-bottom: none;
+}
+
+/* Status Messages */
+.loading {
+  color: #ff9800;
+  font-weight: bold;
+  text-align: center;
+}
+
+.error {
+  color: #c62828;
+  background: #fdecea;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Informational Footer */
+.info-footer {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  margin-top: 40px;
+  padding: 15px 20px;
+  border-top: 1px solid #ddd;
+  background-color: #f9f9f9;
+  line-height: 1.6;
+}
+
+.info-footer strong {
+  color: #333;
+}
+
+/* === Enhanced Custom Toggle Switches === */
+.custom-toggles {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+.toggle-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
 .toggle-switch {
   position: relative;
   width: 100px;
   height: 36px;
-  margin-bottom: 6px;
+  border-radius: 34px;
 }
 
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider base */
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Monthly/Yearly Theme */
+.toggle-group.view .toggle-slider {
+  background-color: #ffcc80;
+}
+
+.toggle-group.view input:checked + .toggle-slider {
+  background-color: #fb8c00;
+  box-shadow: 0 0 12px #fb8c00;
+}
+
+/* Pie/Bar Theme */
+.toggle-group.chart .toggle-slider {
+  background-color: #90caf9;
+}
+
+.toggle-group.chart input:checked + .toggle-slider {
+  background-color: #1976d2;
+  box-shadow: 0 0 12px #1976d2;
+}
+
+/* Knob */
 .toggle-slider::before {
   position: absolute;
   content: "";
-  height: 24px;
-  width: 24px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
+  height: 26px;
+  width: 26px;
+  left: 5px;
+  bottom: 5px;
+  background-color: #fff;
   border-radius: 50%;
+  transition: transform 0.4s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-input:checked + .toggle-slider::before {
-  transform: translateX(64px); /* ✅ Corrected */
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(60px);
 }
 
-.toggle-slider .labels {
+/* Toggle Text Labels (Using pseudo-content) */
+.toggle-slider::after {
+  content: attr(data-off);
   position: absolute;
-  width: 100%;
-  text-align: center;
   top: 50%;
+  left: 12px;
   transform: translateY(-50%);
   font-size: 12px;
   font-weight: 600;
-  color: black;
-  pointer-events: none;
-  white-space: nowrap; /* ✅ Ensures full label is visible */
-  padding: 0 5px;
+  color: #000;
+  transition: all 0.3s ease;
 }
 
-/* ✅ Media Query moved to root level */
-@media (max-width: 500px) {
+.toggle-switch input:checked + .toggle-slider::after {
+  content: attr(data-on);
+  left: 58px;
+  color: #fff;
+}
+
+/* === Responsive Layout === */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+
+  form {
+    padding: 1.25rem;
+  }
+
+  input[type="number"],
+  button {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  #output {
+    padding: 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .result li {
+    font-size: 0.95rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .result li strong {
+    margin-bottom: 0.25rem;
+  }
+
+  h1, h3 {
+    font-size: 1.3rem;
+  }
+
   .toggle-switch {
     width: 90px;
     height: 32px;
   }
 
   .toggle-slider::before {
-    height: 26px;
-    width: 26px;
-    transform: translateX(55px); /* Adjust as needed */
+    height: 22px;
+    width: 22px;
   }
 
-  .toggle-slider .labels {
+  .toggle-slider::after {
     font-size: 11px;
+  }
+
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(52px);
+  }
+
+  .toggle-switch input:checked + .toggle-slider::after {
+    left: 50px;
   }
 }
