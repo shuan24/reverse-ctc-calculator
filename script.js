@@ -15,7 +15,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
     const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ in_hand: desiredSalary })
+      body: JSON.stringify({ in_hand: desiredSalary }) // using consistent key
     });
 
     const data = await response.json();
@@ -37,14 +37,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
         <canvas id="salaryChart" width="400" height="400" style="margin-top: 30px;"></canvas>
       `;
 
-      // Render Pie Chart
-      renderSalaryChart({
-        inHand: data.desired_in_hand,
-        tax: data.monthly_tax,
-        epfEmployee: data.employee_epf,
-        epfEmployer: data.employer_epf,
-        profTax: data.professional_tax
-      });
+      drawChart(data);
     }
   } catch (error) {
     outputDiv.innerHTML = `<p class="error">❌ Failed to connect to backend. Please try again later.</p>`;
@@ -60,63 +53,50 @@ function formatINR(amount) {
   }).format(amount);
 }
 
-// Chart.js Pie Chart Renderer
-let salaryPieChart = null;
+// Draw pie chart using Chart.js
+function drawChart(data) {
+  const ctx = document.getElementById("salaryChart").getContext("2d");
 
-function renderSalaryChart(components) {
-  const ctx = document.getElementById('salaryChart').getContext('2d');
-
-  // Destroy old chart if exists
-  if (salaryPieChart) {
-    salaryPieChart.destroy();
-  }
-
-  salaryPieChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: [
-        'Take-Home Salary',
-        'Employee EPF',
-        'Employer EPF',
-        'Income Tax',
-        'Professional Tax'
+  const chartData = {
+    labels: [
+      "In-Hand Salary",
+      "Income Tax",
+      "Employee EPF",
+      "Employer EPF",
+      "Professional Tax"
+    ],
+    datasets: [{
+      label: "Salary Breakdown",
+      data: [
+        data.desired_in_hand,
+        data.monthly_tax,
+        data.employee_epf,
+        data.employer_epf,
+        data.professional_tax
       ],
-      datasets: [{
-        data: [
-          components.inHand,
-          components.epfEmployee,
-          components.epfEmployer,
-          components.tax,
-          components.profTax
-        ],
-        backgroundColor: [
-          '#4caf50',  // green
-          '#2196f3',  // blue
-          '#ffeb3b',  // yellow
-          '#f44336',  // red
-          '#9c27b0'   // purple
-        ],
-        borderWidth: 1,
-        borderColor: '#fff'
-      }]
-    },
+      backgroundColor: [
+        "#4caf50", // green
+        "#f44336", // red
+        "#2196f3", // blue
+        "#ff9800", // orange
+        "#9c27b0"  // purple
+      ],
+      borderWidth: 1
+    }]
+  };
+
+  new Chart(ctx, {
+    type: "pie",
+    data: chartData,
     options: {
       responsive: true,
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: {
-            font: {
-              size: 14
-            }
-          }
+          position: 'bottom'
         },
         title: {
           display: true,
-          text: 'Monthly Salary Component Breakdown',
-          font: {
-            size: 18
-          }
+          text: 'Monthly Salary Component Breakdown'
         }
       }
     }
