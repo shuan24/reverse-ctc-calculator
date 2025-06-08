@@ -1,4 +1,4 @@
-/* Google Fonts */
+/* Google Fonts & Base Styling */
 body {
   font-family: 'Inter', sans-serif;
   background: #f9f9f9;
@@ -85,6 +85,7 @@ button:hover {
   border-bottom: none;
 }
 
+/* Status Messages */
 .loading {
   color: #ff9800;
   font-weight: bold;
@@ -100,108 +101,7 @@ button:hover {
   text-align: center;
 }
 
-/* Toggle Containers */
-.custom-toggles {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.toggle-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Toggle Switch Base */
-.toggle-switch {
-  position: relative;
-  width: 100px;
-  height: 36px;
-  margin-bottom: 6px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* Shared Slider Style */
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  border-radius: 34px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: 0.4s;
-}
-
-.toggle-slider::before {
-  position: absolute;
-  content: "";
-  height: 24px;
-  width: 24px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-/* Labels inside switch */
-.toggle-slider .labels {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-  font-weight: 600;
-  color: black;
-  pointer-events: none;
-  white-space: nowrap;
-  padding: 0 5px;
-}
-
-/* Monthly/Yearly Switch Theme */
-.toggle-group.view .toggle-slider {
-  background-color: #ff9800;
-}
-
-.toggle-group.view input:checked + .toggle-slider {
-  background-color: #f57c00;
-}
-
-/* Pie/Bar Switch Theme */
-.toggle-group.chart .toggle-slider {
-  background-color: #2196f3;
-}
-
-.toggle-group.chart input:checked + .toggle-slider {
-  background-color: #1976d2;
-}
-
-/* Move Knob */
-input:checked + .toggle-slider::before {
-  transform: translateX(64px);
-}
-
-/* Dynamic Label Text */
-input:not(:checked) + .toggle-slider .labels::after {
-  content: attr(data-off);
-}
-
-input:checked + .toggle-slider .labels::after {
-  content: attr(data-on);
-}
-
-/* Footer */
+/* Informational Footer */
 .info-footer {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
@@ -218,7 +118,114 @@ input:checked + .toggle-slider .labels::after {
   color: #333;
 }
 
-/* Mobile Responsive */
+/* === Enhanced Custom Toggle Switches === */
+.custom-toggles {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Switch Wrapper */
+.toggle-switch {
+  position: relative;
+  width: 100px;
+  height: 36px;
+  margin-bottom: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 34px;
+}
+
+/* Hide Checkbox */
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider Base */
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  background-color: #ccc;
+}
+
+/* Toggle Themes */
+/* Monthly / Yearly Theme */
+.toggle-group.view .toggle-slider {
+  background-color: #ffcc80;
+}
+.toggle-group.view input:checked + .toggle-slider {
+  background-color: #fb8c00;
+  box-shadow: 0 0 10px #fb8c00;
+}
+
+/* Pie / Bar Theme */
+.toggle-group.chart .toggle-slider {
+  background-color: #90caf9;
+}
+.toggle-group.chart input:checked + .toggle-slider {
+  background-color: #1976d2;
+  box-shadow: 0 0 10px #1976d2;
+}
+
+/* Knob */
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Move knob on checked */
+input:checked + .toggle-slider::before {
+  transform: translateX(64px);
+}
+
+/* Labels inside toggle */
+.toggle-slider .labels {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: black;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 0 5px;
+}
+
+/* Dynamic label text */
+input:not(:checked) + .toggle-slider .labels::after {
+  content: attr(data-off);
+}
+input:checked + .toggle-slider .labels::after {
+  content: attr(data-on);
+}
+
+/* === Responsive Layout === */
 @media (max-width: 600px) {
   body {
     padding: 1rem;
@@ -252,18 +259,15 @@ input:checked + .toggle-slider .labels::after {
   h1, h3 {
     font-size: 1.3rem;
   }
-}
 
-/* Toggle Switch Adjustments on Small Screens */
-@media (max-width: 500px) {
   .toggle-switch {
     width: 90px;
     height: 32px;
   }
 
   .toggle-slider::before {
-    height: 24px;
-    width: 24px;
+    height: 22px;
+    width: 22px;
     transform: translateX(55px);
   }
 
