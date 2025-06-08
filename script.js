@@ -97,7 +97,6 @@ function drawChart(data) {
         title: {
           display: true,
           text: 'Monthly Salary Component Breakdown'
-          
         }
       }
     }
