@@ -6,6 +6,8 @@
   <title>Reverse CTC Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
   <div class="container">
@@ -14,7 +16,8 @@
       <input type="number" id="desiredSalary" placeholder="Enter desired monthly in-hand salary (e.g. 17000)" required>
       <button type="submit">Calculate</button>
     </form>
-    <div id="output"></div>
+    <div id="output">, <canvas id="salaryChart" width="400" height="400" style="margin-top: 20px;"></canvas>
+</div>
   </div>
   <script src="script.js"></script>
 </body>
