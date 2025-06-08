@@ -1,6 +1,7 @@
-let salaryChart;
-let chartMode = 'monthly';
-let currentChartType = 'pie';
+let currentChart;  // For managing chart instance
+let currentData = {};  // Global chart data store
+let currentView = "monthly";  // monthly or annual
+let currentChartType = "pie";  // pie or bar
 
 document.getElementById("salaryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -26,34 +27,30 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
 
     if (data.error) {
       outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
-      return;
+    } else {
+      currentData = data;
+
+      outputDiv.innerHTML = `
+        <h3>Results</h3>
+        <ul class="result">
+          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>
+          <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
+          <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
+          <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
+          <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
+          <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
+          <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
+        </ul>
+      `;
+
+      drawChart(data);
     }
-
-    outputDiv.innerHTML = `
-      <h3>Results</h3>
-      <ul class="result">
-        <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>
-        <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
-        <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
-        <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
-        <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
-        <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
-        <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
-      </ul>
-
-      <div style="margin-top: 20px;">
-        <button onclick="toggleChart()">Switch to ${chartMode === 'monthly' ? 'Annual' : 'Monthly'} View</button>
-        <button onclick="toggleChartType()">Toggle Pie/Bar</button>
-      </div>
-    `;
-
-    renderChart(data);
-
   } catch (error) {
     outputDiv.innerHTML = `<p class="error">❌ Failed to connect to backend. Please try again later.</p>`;
   }
 });
 
+// Format currency in Indian style with rupee symbol
 function formatINR(amount) {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -62,92 +59,91 @@ function formatINR(amount) {
   }).format(amount);
 }
 
-function renderChart(data) {
-  const ctx = document.getElementById('salaryChart').getContext('2d');
+function drawChart(data) {
+  const ctx = document.getElementById("salaryChart").getContext("2d");
 
-  if (salaryChart) {
-    salaryChart.destroy();
+  if (currentChart) currentChart.destroy();
+
+  let labels, values, title;
+
+  if (currentView === "monthly") {
+    labels = ["In-Hand Salary", "Income Tax", "Employee EPF", "Professional Tax"];
+    values = [
+      data.desired_in_hand,
+      data.monthly_tax,
+      data.employee_epf,
+      data.professional_tax
+    ];
+    title = "Monthly Salary Breakdown";
+  } else {
+    labels = ["In-Hand Salary", "Income Tax", "Employee EPF", "Professional Tax"];
+    values = [
+      data.desired_in_hand * 12,
+      data.monthly_tax * 12,
+      data.employee_epf * 12,
+      data.professional_tax * 12
+    ];
+    title = "Annual Salary Breakdown";
   }
 
-  const isMonthly = chartMode === 'monthly';
-  const labels = ['In-Hand', 'Income Tax', 'Employee EPF', 'Employer EPF', 'Professional Tax'];
-  const values = isMonthly
-    ? [
-        data.desired_in_hand,
-        data.monthly_tax,
-        data.employee_epf,
-        data.employer_epf,
-        data.professional_tax
-      ]
-    : [
-        data.desired_in_hand * 12,
-        data.monthly_tax * 12,
-        data.employee_epf * 12,
-        data.employer_epf * 12,
-        data.professional_tax * 12
-      ];
+  const backgroundColors = [
+    "#4caf50", // In-Hand
+    "#f44336", // Tax
+    "#ff9800", // EPF
+    "#2196f3"  // PT
+  ];
 
-  const colors = ['#2ecc71', '#e74c3c', '#3498db', '#9b59b6', '#f1c40f'];
-
-  salaryChart = new Chart(ctx, {
+  const config = {
     type: currentChartType,
     data: {
       labels: labels,
       datasets: [{
-        label: isMonthly ? 'Monthly Breakdown' : 'Annual Breakdown',
         data: values,
-        backgroundColor: colors,
-        borderColor: '#ffffff',
-        borderWidth: 1
+        backgroundColor: backgroundColors
       }]
     },
     options: {
       responsive: true,
-      animation: {
-        duration: 1000,
-        easing: 'easeOutQuart'
-      },
       plugins: {
-        tooltip: {
-          callbacks: {
-            label: function (tooltipItem) {
-              const total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
-              const value = tooltipItem.raw;
-              const percent = ((value / total) * 100).toFixed(1);
-              return `${tooltipItem.label}: ${formatINR(value)} (${percent}%)`;
-            }
+        title: {
+          display: true,
+          text: title,
+          font: {
+            size: 18
           }
         },
         legend: {
           position: 'bottom'
         },
-        title: {
-          display: true,
-          text: `${isMonthly ? 'Monthly' : 'Annual'} Salary Breakdown`
-        }
-      },
-      scales: currentChartType === 'bar' ? {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function (value) {
-              return formatINR(value);
-            }
+        datalabels: {
+          color: '#fff',
+          formatter: (value, ctx) => {
+            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            const percent = ((value / total) * 100).toFixed(1);
+            return percent + "%";
           }
         }
-      } : {}
-    }
-  });
+      },
+      animation: {
+        animateRotate: true,
+        animateScale: true
+      }
+    },
+    plugins: [ChartDataLabels]
+  };
+
+  currentChart = new Chart(ctx, config);
 }
 
-function toggleChart() {
-  chartMode = chartMode === 'monthly' ? 'annual' : 'monthly';
-  document.querySelector("button[onclick='toggleChart()']").textContent =
-    `Switch to ${chartMode === 'monthly' ? 'Annual' : 'Monthly'} View`;
-  document.getElementById("salaryForm").dispatchEvent(new Event("submit"));
-}
+// Toggle buttons
+document.getElementById("viewToggle").addEventListener("click", () => {
+  currentView = currentView === "monthly" ? "annual" : "monthly";
+  document.getElementById("viewToggle").textContent = currentView === "monthly" ? "Monthly View" : "Annual View";
+  if (Object.keys(currentData).length > 0) drawChart(currentData);
+});
 
-function toggleChartType() {
-  currentChartType = currentChartType === 'pie' ? 'bar' : 'pie';
-  document.getElementById("salaryForm").dispatchEvent(new Event("submit"));
-}
+document.getElementById("chartTypeToggle").addEventListener("click", () => {
+  currentChartType = currentChartType === "pie" ? "bar" : "pie";
+  document.getElementById("chartTypeToggle").textContent = currentChartType === "pie" ? "Show Bar Chart" : "Show Pie Chart";
+  if (Object.keys(currentData).length > 0) drawChart(currentData);
+});
