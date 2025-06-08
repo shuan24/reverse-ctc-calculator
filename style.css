@@ -86,7 +86,8 @@ input[type="number"] {
 .toggle-switch {
   position: relative;
   width: 100px;
-  height: 30px;
+  height: 36px;
+  margin-bottom: 6px;
 }
 
 .toggle-switch input {
@@ -124,7 +125,7 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider::before {
-  transform: translateX(40px);
+  transform: translateX(60px);
 }
 
 .toggle-slider .labels {
@@ -261,4 +262,21 @@ button:hover {
   h1, h3 {
     font-size: 1.3rem;
   }
+  /* Mobile Responsive Toggle Switch */
+  @media (max-width: 500px) {
+  .toggle-switch {
+    width: 90px;
+    height: 32px;
+  }
+
+  .toggle-slider::before {
+    height: 26px;
+    width: 26px;
+    transform: translateX(55px);
+  }
+
+  .toggle-slider .labels {
+    font-size: 11px;
+  }
+}
 }
