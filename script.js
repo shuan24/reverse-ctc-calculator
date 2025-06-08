@@ -15,8 +15,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
     const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-	  //To make things cleaner in the future, pick either net_salary or in_hand as your official parameter name on both frontend and backend.
-      body: JSON.stringify({ in_hand: desiredSalary })  // ✅ FIXED KEY HERE
+      body: JSON.stringify({ in_hand: desiredSalary })
     });
 
     const data = await response.json();
@@ -36,6 +35,15 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
           <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
         </ul>
       `;
+
+      // Render Pie Chart
+      renderSalaryChart({
+        inHand: data.desired_in_hand,
+        tax: data.monthly_tax,
+        epfEmployee: data.employee_epf,
+        epfEmployer: data.employer_epf,
+        profTax: data.professional_tax
+      });
     }
   } catch (error) {
     outputDiv.innerHTML = `<p class="error">❌ Failed to connect to backend. Please try again later.</p>`;
@@ -49,4 +57,67 @@ function formatINR(amount) {
     currency: 'INR',
     minimumFractionDigits: 0
   }).format(amount);
+}
+
+// Chart.js Pie Chart Renderer
+let salaryPieChart = null;
+
+function renderSalaryChart(components) {
+  const ctx = document.getElementById('salaryChart').getContext('2d');
+
+  // Destroy old chart if exists
+  if (salaryPieChart) {
+    salaryPieChart.destroy();
+  }
+
+  salaryPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: [
+        'Take-Home Salary',
+        'Employee EPF',
+        'Employer EPF',
+        'Income Tax',
+        'Professional Tax'
+      ],
+      datasets: [{
+        data: [
+          components.inHand,
+          components.epfEmployee,
+          components.epfEmployer,
+          components.tax,
+          components.profTax
+        ],
+        backgroundColor: [
+          '#4caf50',  // green
+          '#2196f3',  // blue
+          '#ffeb3b',  // yellow
+          '#f44336',  // red
+          '#9c27b0'   // purple
+        ],
+        borderWidth: 1,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: {
+              size: 14
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: 'Monthly Salary Component Breakdown',
+          font: {
+            size: 18
+          }
+        }
+      }
+    }
+  });
 }
