@@ -136,14 +136,12 @@ function drawChart(data) {
 }
 
 // Toggle buttons
-document.getElementById("viewToggle").addEventListener("change", () => {
-  currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
-  document.getElementById("viewLabel").textContent = currentView === "annual" ? "Annual" : "Monthly";
+document.getElementById("chartTypeToggle").addEventListener("change", () => {
+  currentChartType = document.getElementById("chartTypeToggle").checked ? "bar" : "pie";
   if (Object.keys(currentData).length > 0) drawChart(currentData);
 });
 
-document.getElementById("chartTypeToggle").addEventListener("change", () => {
-  currentChartType = document.getElementById("chartTypeToggle").checked ? "bar" : "pie";
-  document.getElementById("chartTypeLabel").textContent = currentChartType === "bar" ? "Bar" : "Pie";
+document.getElementById("viewToggle").addEventListener("change", () => {
+  currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
   if (Object.keys(currentData).length > 0) drawChart(currentData);
 });
