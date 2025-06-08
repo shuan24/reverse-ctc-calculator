@@ -22,29 +22,26 @@
     
 </div>
   <!--Add Toggle -->
-<div class="custom-toggles">
+  <div class="custom-toggles">
   <!-- Toggle for Monthly / Yearly -->
   <div class="toggle-group view">
-    <label for="viewToggle">Breakdown View</label>
-    <div class="toggle-switch">
+    <label class="toggle-label">Breakdown View</label>
+    <label class="toggle-switch">
       <input type="checkbox" id="viewToggle" />
-      <span class="toggle-slider">
-        <span class="labels" data-on="Yearly" data-off="Monthly"></span>
-      </span>
-    </div>
+      <span class="toggle-slider" data-off="Monthly" data-on="Yearly"></span>
+    </label>
   </div>
 
   <!-- Toggle for Pie / Bar -->
   <div class="toggle-group chart">
-    <label for="chartToggle">Chart Type</label>
-    <div class="toggle-switch">
+    <label class="toggle-label">Chart Type</label>
+    <label class="toggle-switch">
       <input type="checkbox" id="chartToggle" />
-      <span class="toggle-slider">
-        <span class="labels" data-on="Bar" data-off="Pie"></span>
-      </span>
-    </div>
+      <span class="toggle-slider" data-off="Pie" data-on="Bar"></span>
+    </label>
   </div>
 </div>
+
 </div>
     <canvas id="salaryChart" width="400" height="400" style="margin-top: 20px;"></canvas>
   </div>
