@@ -21,24 +21,27 @@
 </div>
     
 </div>
-  <div class="toggle-container">
-  <label class="switch-label">
-    <span>Chart Type:</span>
-    <label class="switch">
+  //Add Toggle
+  <div class="custom-toggles">
+  <div class="toggle-group">
+    <label class="toggle-switch">
       <input type="checkbox" id="chartTypeToggle">
-      <span class="slider round"></span>
+      <span class="toggle-slider">
+        <span class="labels" data-on="Bar" data-off="Pie"></span>
+      </span>
     </label>
-    <span id="chartTypeLabel">Pie</span>
-  </label>
+    <p>Chart Type</p>
+  </div>
 
-  <label class="switch-label">
-    <span>View:</span>
-    <label class="switch">
+  <div class="toggle-group">
+    <label class="toggle-switch">
       <input type="checkbox" id="viewToggle">
-      <span class="slider round"></span>
+      <span class="toggle-slider">
+        <span class="labels" data-on="Yearly" data-off="Monthly"></span>
+      </span>
     </label>
-    <span id="viewLabel">Monthly</span>
-  </label>
+    <p>View</p>
+  </div>
 </div>
     <canvas id="salaryChart" width="400" height="400" style="margin-top: 20px;"></canvas>
   </div>
