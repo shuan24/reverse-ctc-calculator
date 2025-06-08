@@ -36,118 +36,6 @@ input[type="number"] {
   font-size: 1rem;
   box-sizing: border-box;
 }
-.chart-toggle {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.toggle-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.toggle-btn {
-  background-color: #007bff;
-  border: none;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.toggle-btn:hover {
-  background-color: #0056b3;
-}
-
-.toggle-btn.active {
-  background-color: #28a745; /* Green for active */
-}
-/*New Toggle Switch*/
-.custom-toggles {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.toggle-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Inter', sans-serif;
-}
-
-.toggle-switch {
-  position: relative;
-  width: 100px;
-  height: 36px;
-  margin-bottom: 6px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  background-color: #ccc;
-  border-radius: 34px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: 0.4s;
-}
-
-.toggle-slider::before {
-  position: absolute;
-  content: "";
-  height: 24px;
-  width: 24px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-  background-color: #4caf50;
-}
-
-input:checked + .toggle-slider::before {
-  transform: translateX(100px);
-}
-
-.toggle-slider .labels {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-  font-weight: 600;
-  color: black;
-  pointer-events: none;
-}
-
-input:not(:checked) + .toggle-slider .labels::after {
-  content: attr(data-off);
-}
-
-input:checked + .toggle-slider .labels::after {
-  content: attr(data-on);
-}
-/*New Toggle Ends here*/
 
 button {
   background: #007bff;
@@ -211,6 +99,109 @@ button:hover {
   font-weight: bold;
   text-align: center;
 }
+
+/* Toggle Containers */
+.custom-toggles {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Toggle Switch Base */
+.toggle-switch {
+  position: relative;
+  width: 100px;
+  height: 36px;
+  margin-bottom: 6px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Shared Slider Style */
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Labels inside switch */
+.toggle-slider .labels {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: black;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 0 5px;
+}
+
+/* Monthly/Yearly Switch Theme */
+.toggle-group.view .toggle-slider {
+  background-color: #ff9800;
+}
+
+.toggle-group.view input:checked + .toggle-slider {
+  background-color: #f57c00;
+}
+
+/* Pie/Bar Switch Theme */
+.toggle-group.chart .toggle-slider {
+  background-color: #2196f3;
+}
+
+.toggle-group.chart input:checked + .toggle-slider {
+  background-color: #1976d2;
+}
+
+/* Move Knob */
+input:checked + .toggle-slider::before {
+  transform: translateX(64px);
+}
+
+/* Dynamic Label Text */
+input:not(:checked) + .toggle-slider .labels::after {
+  content: attr(data-off);
+}
+
+input:checked + .toggle-slider .labels::after {
+  content: attr(data-on);
+}
+
+/* Footer */
 .info-footer {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
@@ -226,7 +217,6 @@ button:hover {
 .info-footer strong {
   color: #333;
 }
-
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
@@ -262,21 +252,22 @@ button:hover {
   h1, h3 {
     font-size: 1.3rem;
   }
-  /* Mobile Responsive Toggle Switch */
-  @media (max-width: 500px) {
+}
+
+/* Toggle Switch Adjustments on Small Screens */
+@media (max-width: 500px) {
   .toggle-switch {
     width: 90px;
     height: 32px;
   }
 
   .toggle-slider::before {
-    height: 26px;
-    width: 26px;
+    height: 24px;
+    width: 24px;
     transform: translateX(55px);
   }
 
   .toggle-slider .labels {
     font-size: 11px;
   }
-}
 }
