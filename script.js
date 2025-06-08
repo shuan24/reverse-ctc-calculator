@@ -34,6 +34,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
           <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
           <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
         </ul>
+        <canvas id="salaryChart" width="400" height="400" style="margin-top: 30px;"></canvas>
       `;
 
       // Render Pie Chart
