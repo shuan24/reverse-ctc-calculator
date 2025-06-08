@@ -26,13 +26,13 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
       outputDiv.innerHTML = `
         <h3>Results</h3>
         <ul class="result">
-          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_inhand)}</li>
-          <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.estimated_gross_monthly)}</li>
-          <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
-          <li><strong>Employee EPF:</strong> ${formatINR(data.monthly_epf_employee)}</li>
-          <li><strong>Employer EPF:</strong> ${formatINR(data.monthly_epf_employer)}</li>
-          <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
-          <li><strong>Total Annual CTC:</strong> ${formatINR(data.estimated_annual_ctc)}</li>
+    <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>
+    <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
+    <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
+    <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
+    <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
+    <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
+    <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
         </ul>
       `;
     }
