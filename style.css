@@ -36,6 +36,37 @@ input[type="number"] {
   font-size: 1rem;
   box-sizing: border-box;
 }
+.chart-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle-btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #0056b3;
+}
+
+.toggle-btn.active {
+  background-color: #28a745; /* Green for active */
+}
 
 button {
   background: #007bff;
