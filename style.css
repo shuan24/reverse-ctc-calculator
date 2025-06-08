@@ -125,7 +125,7 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider::before {
-  transform: translateX(60px);
+  transform: translateX(100px);
 }
 
 .toggle-slider .labels {
