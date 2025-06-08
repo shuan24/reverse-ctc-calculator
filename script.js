@@ -1,7 +1,7 @@
 document.getElementById("salaryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const desiredSalary = parseFloat(document.getElementById("desired_inhand").value);
+  const desiredSalary = parseFloat(document.getElementById("desiredSalary").value);
   const outputDiv = document.getElementById("output");
 
   if (isNaN(desiredSalary) || desiredSalary <= 0) {
@@ -15,7 +15,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
     const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ net_salary: desired_inhand })  // ✅ FIXED KEY HERE
+      body: JSON.stringify({ net_salary: desiredSalary })  // ✅ FIXED KEY HERE
     });
 
     const data = await response.json();
