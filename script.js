@@ -1,7 +1,7 @@
 document.getElementById("salaryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const desiredSalary = parseFloat(document.getElementById("desiredSalary").value);
+  const desiredSalary = parseFloat(document.getElementById("desired_inhand").value);
   const outputDiv = document.getElementById("output");
 
   if (isNaN(desiredSalary) || desiredSalary <= 0) {
@@ -15,7 +15,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
     const response = await fetch("https://shuan24.pythonanywhere.com/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ net_salary: desiredSalary })  // ✅ FIXED KEY HERE
+      body: JSON.stringify({ net_salary: desired_inhand })  // ✅ FIXED KEY HERE
     });
 
     const data = await response.json();
@@ -26,7 +26,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
       outputDiv.innerHTML = `
         <h3>Results</h3>
         <ul class="result">
-          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_net_monthly)}</li>
+          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_inhand)}</li>
           <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.estimated_gross_monthly)}</li>
           <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
           <li><strong>Employee EPF:</strong> ${formatINR(data.monthly_epf_employee)}</li>
