@@ -26,7 +26,7 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
       outputDiv.innerHTML = `
         <h3>Results</h3>
         <ul class="result">
-          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_inhand)}</li>
+          <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_net_monthly)}</li>
           <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.estimated_gross_monthly)}</li>
           <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
           <li><strong>Employee EPF:</strong> ${formatINR(data.monthly_epf_employee)}</li>
