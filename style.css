@@ -135,7 +135,7 @@ input:checked + .toggle-slider::before {
   transform: translateY(-50%);
   font-size: 12px;
   font-weight: 600;
-  color: white;
+  color: black;
   pointer-events: none;
 }
 
