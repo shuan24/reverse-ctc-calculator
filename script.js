@@ -1,5 +1,6 @@
-let salaryChart;  // global chart instance
-let chartMode = 'monthly';  // default mode
+let salaryChart;
+let chartMode = 'monthly';
+let currentChartType = 'pie';
 
 document.getElementById("salaryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -28,7 +29,6 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
       return;
     }
 
-    // UI Output
     outputDiv.innerHTML = `
       <h3>Results</h3>
       <ul class="result">
@@ -54,7 +54,6 @@ document.getElementById("salaryForm").addEventListener("submit", async function 
   }
 });
 
-// Format currency in Indian style with rupee symbol
 function formatINR(amount) {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -63,18 +62,14 @@ function formatINR(amount) {
   }).format(amount);
 }
 
-// Chart rendering logic
-let currentChartType = 'pie';
-
 function renderChart(data) {
   const ctx = document.getElementById('salaryChart').getContext('2d');
 
   if (salaryChart) {
-    salaryChart.destroy(); // Destroy existing chart before creating new
+    salaryChart.destroy();
   }
 
   const isMonthly = chartMode === 'monthly';
-
   const labels = ['In-Hand', 'Income Tax', 'Employee EPF', 'Employer EPF', 'Professional Tax'];
   const values = isMonthly
     ? [
@@ -92,9 +87,9 @@ function renderChart(data) {
         data.professional_tax * 12
       ];
 
-  const colors = ['#4CAF50', '#FF9800', '#2196F3', '#9C27B0', '#F44336'];
+  const colors = ['#2ecc71', '#e74c3c', '#3498db', '#9b59b6', '#f1c40f'];
 
-  const config = {
+  salaryChart = new Chart(ctx, {
     type: currentChartType,
     data: {
       labels: labels,
@@ -102,10 +97,16 @@ function renderChart(data) {
         label: isMonthly ? 'Monthly Breakdown' : 'Annual Breakdown',
         data: values,
         backgroundColor: colors,
+        borderColor: '#ffffff',
+        borderWidth: 1
       }]
     },
     options: {
       responsive: true,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
       plugins: {
         tooltip: {
           callbacks: {
@@ -124,11 +125,19 @@ function renderChart(data) {
           display: true,
           text: `${isMonthly ? 'Monthly' : 'Annual'} Salary Breakdown`
         }
-      }
+      },
+      scales: currentChartType === 'bar' ? {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return formatINR(value);
+            }
+          }
+        }
+      } : {}
     }
-  };
-
-  salaryChart = new Chart(ctx, config);
+  });
 }
 
 function toggleChart() {
