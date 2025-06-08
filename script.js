@@ -135,12 +135,13 @@ function drawChart(data) {
   currentChart = new Chart(ctx, config);
 }
 
-// Toggle buttons
-document.getElementById("chartTypeToggle").addEventListener("change", () => {
-  currentChartType = document.getElementById("chartTypeToggle").checked ? "bar" : "pie";
+// Toggle: Pie ↔ Bar
+document.getElementById("chartToggle").addEventListener("change", () => {
+  currentChartType = document.getElementById("chartToggle").checked ? "bar" : "pie";
   if (Object.keys(currentData).length > 0) drawChart(currentData);
 });
 
+// Toggle: Monthly ↔ Annual
 document.getElementById("viewToggle").addEventListener("change", () => {
   currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
   if (Object.keys(currentData).length > 0) drawChart(currentData);
