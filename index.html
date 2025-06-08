@@ -5,64 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>India Reverse Salary Calculator</title>
     <style>
-        /* ... (keep your existing styles) ... */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2563eb;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .error {
-            color: #e53e3e;
-            background: #fed7d7;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
-            display: none;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f5f7fa; color: #333; line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 30px; margin-top: 20px; }
+        h1 { color: #2563eb; text-align: center; margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #4b5563; }
+        input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; }
+        button { background: #2563eb; color: white; border: none; padding: 14px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; transition: background 0.3s; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .results { margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 25px; display: none; }
+        .result-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+        .result-value { font-weight: 700; color: #1e40af; }
+        .highlight { background: #eff6ff; border-radius: 6px; padding: 15px; margin-top: 20px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error { color: #e53e3e; background: #fed7d7; padding: 15px; border-radius: 6px; margin-top: 20px; display: none; }
+        footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 0.9rem; }
     </style>
 </head>
 <body>
     <div class="container">
+        <h1>India Reverse Salary Calculator</h1>
+        
         <div class="card">
-            <h1>India Reverse Salary Calculator</h1>
             <div class="input-group">
                 <label for="salary">Desired Monthly In-hand Salary (₹):</label>
                 <input type="number" id="salary" placeholder="e.g. 75000" min="10000" step="1000">
             </div>
-            <button onclick="calculate()">Calculate CTC</button>
+            <button id="calculate-btn" onclick="calculate()">Calculate CTC</button>
             
             <div class="loader" id="loader"></div>
             <div class="error" id="error"></div>
             
             <div id="results" class="results">
-                <!-- ... (keep your existing results structure) ... -->
+                <div class="result-item">
+                    <span>Monthly Gross Salary:</span>
+                    <span class="result-value">₹<span id="monthly_gross">0</span></span>
+                </div>
+                <div class="result-item">
+                    <span>Monthly Income Tax:</span>
+                    <span class="result-value">₹<span id="monthly_tax">0</span></span>
+                </div>
+                <div class="result-item">
+                    <span>Employee EPF Contribution:</span>
+                    <span class="result-value">₹<span id="employee_pf">0</span></span>
+                </div>
+                <div class="result-item">
+                    <span>Employer EPF Contribution:</span>
+                    <span class="result-value">₹<span id="employer_pf">0</span></span>
+                </div>
+                <div class="highlight">
+                    <div class="result-item">
+                        <span><strong>Annual CTC:</strong></span>
+                        <span class="result-value"><strong>₹<span id="annual_ctc">0</span></strong></span>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <footer>
+            <p>Note: Calculations based on India's new tax regime for FY 2025-26</p>
+        </footer>
     </div>
 
     <script>
         function calculate() {
-            const salary = document.getElementById('salary').value;
+            const salaryInput = document.getElementById('salary');
+            const salary = salaryInput.value;
+            const btn = document.getElementById('calculate-btn');
+            
             if (!salary || salary < 10000) {
                 showError("Please enter a valid salary (minimum ₹10,000)");
                 return;
             }
             
-            // Show loader, hide results and error
+            // UI State
+            btn.disabled = true;
             document.getElementById('loader').style.display = 'block';
             document.getElementById('results').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             
-            // Replace with your PythonAnywhere URL
+            // Use YOUR PythonAnywhere username here
             const backendUrl = "https://shuan24.pythonanywhere.com/calculate";
             
             fetch(backendUrl, {
@@ -72,7 +98,9 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.error || 'Server error') });
+                    return response.json().then(err => { 
+                        throw new Error(err.error || `Server error: ${response.status}`) 
+                    });
                 }
                 return response.json();
             })
@@ -81,18 +109,21 @@
                     throw new Error(data.error);
                 }
                 
-                document.getElementById('monthly_gross').textContent = data.monthly_gross.toLocaleString('en-IN');
-                document.getElementById('monthly_tax').textContent = data.monthly_tax.toLocaleString('en-IN');
-                document.getElementById('employee_pf').textContent = data.employee_pf.toLocaleString('en-IN');
-                document.getElementById('employer_pf').textContent = data.employer_pf.toLocaleString('en-IN');
-                document.getElementById('annual_ctc').textContent = data.annual_ctc.toLocaleString('en-IN');
+                // Update UI with results
+                document.getElementById('monthly_gross').textContent = data.monthly_gross.toLocaleString('en-IN', {maximumFractionDigits:2});
+                document.getElementById('monthly_tax').textContent = data.monthly_tax.toLocaleString('en-IN', {maximumFractionDigits:2});
+                document.getElementById('employee_pf').textContent = data.employee_pf.toLocaleString('en-IN', {maximumFractionDigits:2});
+                document.getElementById('employer_pf').textContent = data.employer_pf.toLocaleString('en-IN', {maximumFractionDigits:2});
+                document.getElementById('annual_ctc').textContent = data.annual_ctc.toLocaleString('en-IN', {maximumFractionDigits:2});
                 document.getElementById('results').style.display = 'block';
             })
             .catch(error => {
-                showError(error.message || 'Error calculating salary. Please try again.');
+                console.error('API Error:', error);
+                showError(error.message || 'Network error. Please check your connection and try again.');
             })
             .finally(() => {
                 document.getElementById('loader').style.display = 'none';
+                btn.disabled = false;
             });
         }
         
@@ -100,8 +131,14 @@
             const errorDiv = document.getElementById('error');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
-            document.getElementById('results').style.display = 'none';
         }
+        
+        // Enable Enter key to submit
+        document.getElementById('salary').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
     </script>
 </body>
 </html>
