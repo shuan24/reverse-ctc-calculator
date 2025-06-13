@@ -14,7 +14,7 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
   }
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
   try {
-    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {
+    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {  
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ in_hand: desiredSalary })
@@ -53,12 +53,13 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
       outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
     } else {
       currentData = {
-        desired_in_hand: data.in_hand_monthly,
+        in_hand_monthly: data.in_hand_monthly,
         gross_monthly: data.gross_monthly,
         monthly_tax: data.monthly_tax,
         employee_epf: data.employee_epf,
         employer_epf: data.employer_epf,
         professional_tax: data.professional_tax,
+        gratuity_annual: data.gratuity_annual,
         annual_ctc: data.annual_ctc
       };
       displayResults(currentData);
@@ -67,15 +68,6 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
   } catch {
     outputDiv.innerHTML = `<p class="error">❌ Calculation failed. Try again later.</p>`;
   }
-});
-
-// 📌 Calculator mode toggle
-document.getElementById("calculatorToggle").addEventListener("change", function () {
-  document.getElementById("salaryForm").style.display = this.checked ? "none" : "block";
-  document.getElementById("normalForm").style.display = this.checked ? "block" : "none";
-  document.getElementById("output").innerHTML = "";
-  if (currentChart) currentChart.destroy();
-  currentData = {};
 });
 
 // 📌 Chart type toggle (Pie ↔ Bar)
@@ -92,15 +84,20 @@ document.getElementById("viewToggle").addEventListener("change", () => {
 
 // 📌 Render the textual breakdown result
 function displayResults(data) {
+  const isReverse = data.desired_in_hand !== undefined;
+  
   document.getElementById("output").innerHTML = `
     <h3>Results</h3>
     <ul class="result">
-      <li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>
+      ${isReverse ? 
+        `<li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>` : 
+        `<li><strong>In-Hand Salary (Monthly):</strong> ${formatINR(data.in_hand_monthly)}</li>`}
       <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
       <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
       <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
-      <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}</li>
+      <li><strong>Employer EPF (Monthly):</strong> ${formatINR(data.employer_epf)}</li>
       <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
+      <li><strong>Gratuity (Annual):</strong> ${formatINR(data.gratuity_annual)}</li>
       <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
     </ul>
   `;
@@ -111,13 +108,18 @@ function drawChart(data) {
   const ctx = document.getElementById("salaryChart").getContext("2d");
   if (currentChart) currentChart.destroy();
 
+  // Use in-hand or gross salary based on calculator type
+  const inHandValue = data.in_hand_monthly || data.desired_in_hand;
+  
   const labels = ["In‑Hand", "Income Tax", "Employee EPF", "Prof. Tax"];
   const rawValues = [
-    data.desired_in_hand, data.monthly_tax, data.employee_epf, data.professional_tax
+    inHandValue, data.monthly_tax, data.employee_epf, data.professional_tax
   ];
+  
   const values = currentView === "monthly"
     ? rawValues
     : rawValues.map(v => v * 12);
+  
   const title = currentView === "monthly"
     ? "Monthly Salary Breakdown"
     : "Annual Salary Breakdown";
@@ -134,14 +136,24 @@ function drawChart(data) {
     options: {
       responsive: true,
       plugins: {
-        title: { display: true, text: title, font: { size: 18 } },
+        title: { 
+          display: true, 
+          text: title, 
+          font: { size: 18 },
+          padding: { top: 10, bottom: 20 }
+        },
         legend: { position: "bottom" },
         datalabels: {
           color: "#fff",
-          formatter: (v, ctx) => ((v / ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0)) * 100).toFixed(1) + "%"
+          font: { weight: "bold", size: 14 },
+          formatter: (v, ctx) => {
+            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            return ((v / total) * 100).toFixed(1) + "%";
+          }
         }
       },
-      animation: { animateRotate: true, animateScale: true }
+      animation: { animateRotate: true, animateScale: true },
+      maintainAspectRatio: false
     },
     plugins: [ChartDataLabels]
   });
@@ -150,6 +162,9 @@ function drawChart(data) {
 // 💱 Format INR currency
 function formatINR(amount) {
   return new Intl.NumberFormat("en-IN", {
-    style: "currency", currency: "INR", minimumFractionDigits: 0
+    style: "currency", 
+    currency: "INR", 
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(amount);
 }
