@@ -224,6 +224,28 @@ button:hover {
   color: #fff;
 }
 
+/* === Chart Container Styling === */
+#chartContainer {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Canvas Styling for Chart.js */
+#salaryChart {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 400px;
+}
+
+/* For bar chart labels spacing if needed */
+.chartjs-render-monitor {
+  margin-top: 1rem;
+}
+
 /* === Responsive Layout === */
 @media (max-width: 600px) {
   body {
@@ -280,4 +302,50 @@ button:hover {
   .toggle-switch input:checked + .toggle-slider::after {
     left: 50px;
   }
+  
+  /* === Tab Switcher Styling === */
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tab-buttons button {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #007bff;
+  background: #fff;
+  color: #007bff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.tab-buttons button:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+.tab-buttons .active-tab {
+  background: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive Tab Styling */
+@media (max-width: 600px) {
+  .tab-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tab-buttons button {
+    width: 100%;
+    min-width: unset;
+  }
+}
 }
