@@ -1,56 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Indian Reverse CTC Calculator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
 </head>
 <body>
   <div class="container">
-    <h1>Indian Reverse CTC Calculator</h1>
-    <form id="salaryForm">
-      <input type="number" id="desiredSalary" placeholder="Enter desired monthly in-hand salary (e.g. 17000)" required>
+    <h1>Indian CTC ↔ In-hand Salary Calculator</h1>
+
+    <!-- 🔁 Tab Switcher -->
+    <div class="tab-buttons">
+      <button id="tabCTC" class="active-tab">CTC → In-hand</button>
+      <button id="tabReverse">In-hand → CTC</button>
+    </div>
+
+    <!-- 💼 CTC → In-hand Calculator -->
+    <form id="normalForm">
+      <input type="number" id="inputCTC" placeholder="Enter annual CTC (e.g. 550000)" required />
       <button type="submit">Calculate</button>
     </form>
-    <div id="output">
-</div>
-    
-</div>
-  <!--Add Toggle -->
-  <div class="custom-toggles">
-  <!-- Toggle for Monthly / Yearly -->
-  <div class="toggle-group view">
-    <label class="toggle-label">Breakdown View</label>
-    <label class="toggle-switch">
-      <input type="checkbox" id="viewToggle" />
-      <span class="toggle-slider" data-off="Monthly" data-on="Yearly"></span>
-    </label>
+
+    <!-- 🔁 In-hand → CTC Calculator -->
+    <form id="salaryForm" style="display: none;">
+      <input type="number" id="desiredSalary" placeholder="Enter desired monthly in-hand salary (e.g. 17000)" required />
+      <button type="submit">Calculate</button>
+    </form>
+
+    <!-- 📊 Output -->
+    <div id="output"></div>
+
+    <!-- 🔄 Chart and View Toggles -->
+    <div class="custom-toggles">
+      <!-- Toggle for Monthly / Yearly -->
+      <div class="toggle-group view">
+        <label class="toggle-label">Breakdown View</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="viewToggle" />
+          <span class="toggle-slider" data-off="Monthly" data-on="Yearly"></span>
+        </label>
+      </div>
+
+      <!-- Toggle for Pie / Bar -->
+      <div class="toggle-group chart">
+        <label class="toggle-label">Chart Type</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chartToggle" />
+          <span class="toggle-slider" data-off="Pie" data-on="Bar"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 📈 Chart -->
+    <div id="chartContainer">
+      <canvas id="salaryChart"></canvas>
+    </div>
   </div>
 
-  <!-- Toggle for Pie / Bar -->
-  <div class="toggle-group chart">
-    <label class="toggle-label">Chart Type</label>
-    <label class="toggle-switch">
-      <input type="checkbox" id="chartToggle" />
-      <span class="toggle-slider" data-off="Pie" data-on="Bar"></span>
-    </label>
-  </div>
-</div>
-
-</div>
-    <canvas id="salaryChart" width="400" height="400" style="margin-top: 20px;"></canvas>
-  </div>
-  <script src="script.js"></script>
+  <!-- 📜 Footer -->
   <footer class="info-footer">
-  <p>
-    <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br>
-    Professional Tax: ₹200/month &nbsp;|&nbsp; Standard Deduction: ₹75,000 &nbsp;|&nbsp; Employee PF: 12% of Basic (Basic = 40% of Gross)
-  </p>
-</footer>
+    <p>
+      <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br />
+      Professional Tax: ₹200/month &nbsp;|&nbsp; Standard Deduction: ₹75,000 &nbsp;|&nbsp; Employee PF: 12% of Basic (Basic = 40% of Gross)
+    </p>
+  </footer>
+
+  <!-- 🧠 Script -->
+  <script>
+    // Tab toggle logic
+    const tabCTC = document.getElementById('tabCTC');
+    const tabReverse = document.getElementById('tabReverse');
+    const normalForm = document.getElementById('normalForm');
+    const salaryForm = document.getElementById('salaryForm');
+
+    tabCTC.addEventListener('click', () => {
+      tabCTC.classList.add('active-tab');
+      tabReverse.classList.remove('active-tab');
+      normalForm.style.display = 'block';
+      salaryForm.style.display = 'none';
+    });
+
+    tabReverse.addEventListener('click', () => {
+      tabReverse.classList.add('active-tab');
+      tabCTC.classList.remove('active-tab');
+      normalForm.style.display = 'none';
+      salaryForm.style.display = 'block';
+    });
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>
