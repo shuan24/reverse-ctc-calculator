@@ -249,19 +249,11 @@ function renderTaxBreakdown(breakdown) {
   tbody.appendChild(totalRow);
 }
 
-// 💱 Format INR currency
+// 💱 Format INR currency (exact amounts)
 function formatINR(amount) {
-  // Handle very large numbers with abbreviations
-  if (Math.abs(amount) >= 10000000) {
-    return '₹' + (amount / 10000000).toFixed(1) + ' Cr';
-  }
-  if (Math.abs(amount) >= 100000) {
-    return '₹' + (amount / 100000).toFixed(1) + ' L';
-  }
-  
   return new Intl.NumberFormat("en-IN", {
-    style: "currency", 
-    currency: "INR", 
+    style: "currency",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(amount);
