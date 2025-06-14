@@ -1,24 +1,33 @@
-let currentChart;            // Chart.js instance
-let currentData = {};        // Latest fetched data
-let currentView = "monthly"; // "monthly" or "annual"
-let currentChartType = "pie"; // "pie" or "bar"
+let currentChart;
+let currentData = {};
+let currentView = "monthly";
+let currentChartType = "pie";
 
 // 📌 Reverse CTC: In-Hand → CTC
 document.getElementById("salaryForm").addEventListener("submit", async e => {
   e.preventDefault();
   const desiredSalary = parseFloat(document.getElementById("desiredSalary").value);
+  const basicPercent = parseFloat(document.getElementById("basicPercentReverse").value) / 100;
   const outputDiv = document.getElementById("output");
-  if (isNaN(desiredSalary) || desiredSalary <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid positive number.</p>`;
+  
+  if (isNaN(desiredSalary) {
+    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid salary</p>`;
     return;
   }
+  
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
+  document.getElementById("taxBreakdown").classList.add("hidden");
+  
   try {
     const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {  
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ in_hand: desiredSalary })
+      body: JSON.stringify({ 
+        in_hand: desiredSalary,
+        basic_percent: basicPercent 
+      })
     });
+    
     const data = await res.json();
     if (data.error) {
       outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
@@ -26,9 +35,13 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
       currentData = data;
       displayResults(data);
       drawChart(data);
+      if (data.tax_breakdown) {
+        renderTaxBreakdown(data.tax_breakdown);
+      }
     }
-  } catch {
+  } catch (err) {
     outputDiv.innerHTML = `<p class="error">❌ Failed to connect. Try again later.</p>`;
+    console.error(err);
   }
 });
 
@@ -36,18 +49,27 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
 document.getElementById("normalForm").addEventListener("submit", async e => {
   e.preventDefault();
   const annualCTC = parseFloat(document.getElementById("inputCTC").value);
+  const basicPercent = parseFloat(document.getElementById("basicPercentNormal").value) / 100;
   const outputDiv = document.getElementById("output");
-  if (isNaN(annualCTC) || annualCTC <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC amount.</p>`;
+  
+  if (isNaN(annualCTC)) {
+    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC</p>`;
     return;
   }
+  
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
+  document.getElementById("taxBreakdown").classList.add("hidden");
+  
   try {
     const res = await fetch("https://shuan24.pythonanywhere.com/calculate_inhand", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ctc: annualCTC })
+      body: JSON.stringify({ 
+        ctc: annualCTC,
+        basic_percent: basicPercent
+      })
     });
+    
     const data = await res.json();
     if (data.error) {
       outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
@@ -60,29 +82,34 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
         employer_epf: data.employer_epf,
         professional_tax: data.professional_tax,
         gratuity_annual: data.gratuity_annual,
-        annual_ctc: data.annual_ctc
+        annual_ctc: data.annual_ctc,
+        tax_breakdown: data.tax_breakdown
       };
       displayResults(currentData);
       drawChart(currentData);
+      if (data.tax_breakdown) {
+        renderTaxBreakdown(data.tax_breakdown);
+      }
     }
-  } catch {
+  } catch (err) {
     outputDiv.innerHTML = `<p class="error">❌ Calculation failed. Try again later.</p>`;
+    console.error(err);
   }
 });
 
-// 📌 Chart type toggle (Pie ↔ Bar)
+// 📌 Chart type toggle
 document.getElementById("chartToggle").addEventListener("change", () => {
   currentChartType = document.getElementById("chartToggle").checked ? "bar" : "pie";
   if (Object.keys(currentData).length) drawChart(currentData);
 });
 
-// 📌 View mode toggle (Monthly ↔ Annual)
+// 📌 View mode toggle
 document.getElementById("viewToggle").addEventListener("change", () => {
   currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
   if (Object.keys(currentData).length) drawChart(currentData);
 });
 
-// 📌 Render the textual breakdown result
+// 📌 Render results
 function displayResults(data) {
   const isReverse = data.desired_in_hand !== undefined;
   
@@ -90,39 +117,29 @@ function displayResults(data) {
     <h3>Results</h3>
     <ul class="result">
       ${isReverse ? 
-        `<li><strong>Desired In-Hand (Monthly):</strong> ${formatINR(data.desired_in_hand)}</li>` : 
-        `<li><strong>In-Hand Salary (Monthly):</strong> ${formatINR(data.in_hand_monthly)}</li>`}
-      <li><strong>Gross Monthly Salary:</strong> ${formatINR(data.gross_monthly)}</li>
-      <li><strong>Monthly Income Tax:</strong> ${formatINR(data.monthly_tax)}</li>
-      <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}</li>
-      <li><strong>Employer EPF (Monthly):</strong> ${formatINR(data.employer_epf)}</li>
-      <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}</li>
-      <li><strong>Gratuity (Annual):</strong> ${formatINR(data.gratuity_annual)}</li>
-      <li><strong>Total Annual CTC:</strong> ${formatINR(data.annual_ctc)}</li>
+        `<li><strong>Desired In-Hand:</strong> ${formatINR(data.desired_in_hand)}/month</li>` : 
+        `<li><strong>In-Hand Salary:</strong> ${formatINR(data.in_hand_monthly)}/month</li>`}
+      <li><strong>Gross Salary:</strong> ${formatINR(data.gross_monthly)}/month</li>
+      <li><strong>Income Tax:</strong> ${formatINR(data.monthly_tax)}/month</li>
+      <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}/month</li>
+      <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}/month</li>
+      <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}/month</li>
+      <li><strong>Gratuity:</strong> ${formatINR(data.gratuity_annual)}/year</li>
+      <li class="highlight"><strong>Total CTC:</strong> ${formatINR(data.annual_ctc)}/year</li>
     </ul>
   `;
 }
 
-// 📊 Draw the Pie/Bar chart
+// 📊 Draw chart
 function drawChart(data) {
   const ctx = document.getElementById("salaryChart").getContext("2d");
   if (currentChart) currentChart.destroy();
 
-  // Use in-hand or gross salary based on calculator type
   const inHandValue = data.in_hand_monthly || data.desired_in_hand;
-  
-  const labels = ["In‑Hand", "Income Tax", "Employee EPF", "Prof. Tax"];
-  const rawValues = [
-    inHandValue, data.monthly_tax, data.employee_epf, data.professional_tax
-  ];
-  
-  const values = currentView === "monthly"
-    ? rawValues
-    : rawValues.map(v => v * 12);
-  
-  const title = currentView === "monthly"
-    ? "Monthly Salary Breakdown"
-    : "Annual Salary Breakdown";
+  const labels = ["Take‑Home", "Income Tax", "Employee EPF", "Prof. Tax"];
+  const rawValues = [inHandValue, data.monthly_tax, data.employee_epf, data.professional_tax];
+  const values = currentView === "monthly" ? rawValues : rawValues.map(v => v * 12);
+  const title = currentView === "monthly" ? "Monthly Breakdown" : "Annual Breakdown";
 
   currentChart = new Chart(ctx, {
     type: currentChartType,
@@ -159,8 +176,45 @@ function drawChart(data) {
   });
 }
 
+// 📈 Render tax breakdown
+function renderTaxBreakdown(breakdown) {
+  const container = document.getElementById("taxBreakdown");
+  const tbody = document.querySelector("#taxTable tbody");
+  
+  tbody.innerHTML = "";
+  container.classList.remove("hidden");
+  
+  breakdown.forEach(slab => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${formatINR(slab.start)} - ${formatINR(slab.end)}</td>
+      <td>${(slab.rate * 100).toFixed(0)}%</td>
+      <td>${formatINR(slab.tax)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+  
+  // Add total row
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
+  totalRow.innerHTML = `
+    <td><strong>Total Tax</strong></td>
+    <td></td>
+    <td><strong>${formatINR(breakdown.reduce((sum, slab) => sum + slab.tax, 0))}</strong></td>
+  `;
+  tbody.appendChild(totalRow);
+}
+
 // 💱 Format INR currency
 function formatINR(amount) {
+  // Handle very large numbers with abbreviations
+  if (amount >= 10000000) {
+    return '₹' + (amount / 10000000).toFixed(1) + ' Cr';
+  }
+  if (amount >= 100000) {
+    return '₹' + (amount / 100000).toFixed(1) + ' L';
+  }
+  
   return new Intl.NumberFormat("en-IN", {
     style: "currency", 
     currency: "INR", 
