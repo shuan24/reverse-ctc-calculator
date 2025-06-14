@@ -10,16 +10,15 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
   const basicPercent = parseFloat(document.getElementById("basicPercentReverse").value) / 100;
   const outputDiv = document.getElementById("output");
   
-  if (isNaN(desiredSalary) {
+  if (isNaN(desiredSalary) || desiredSalary <= 0) {
     outputDiv.innerHTML = `<p class="error">❌ Please enter a valid salary</p>`;
     return;
   }
   
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
-  document.getElementById("taxBreakdown").classList.add("hidden");
   
   try {
-    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {  
+    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -29,19 +28,17 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
     });
     
     const data = await res.json();
-    if (data.error) {
-      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
-    } else {
-      currentData = data;
-      displayResults(data);
-      drawChart(data);
-      if (data.tax_breakdown) {
-        renderTaxBreakdown(data.tax_breakdown);
-      }
+    if (!res.ok) {
+      throw new Error(data.error || "Unknown error");
     }
+    
+    currentData = data;
+    displayResults(data);
+    drawChart(data);
+    
   } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Failed to connect. Try again later.</p>`;
-    console.error(err);
+    outputDiv.innerHTML = `<p class="error">❌ Error: ${err.message}</p>`;
+    console.error("Calculation error:", err);
   }
 });
 
@@ -52,13 +49,12 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
   const basicPercent = parseFloat(document.getElementById("basicPercentNormal").value) / 100;
   const outputDiv = document.getElementById("output");
   
-  if (isNaN(annualCTC)) {
+  if (isNaN(annualCTC) || annualCTC <= 0) {
     outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC</p>`;
     return;
   }
   
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
-  document.getElementById("taxBreakdown").classList.add("hidden");
   
   try {
     const res = await fetch("https://shuan24.pythonanywhere.com/calculate_inhand", {
@@ -71,29 +67,27 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
     });
     
     const data = await res.json();
-    if (data.error) {
-      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
-    } else {
-      currentData = {
-        in_hand_monthly: data.in_hand_monthly,
-        gross_monthly: data.gross_monthly,
-        monthly_tax: data.monthly_tax,
-        employee_epf: data.employee_epf,
-        employer_epf: data.employer_epf,
-        professional_tax: data.professional_tax,
-        gratuity_annual: data.gratuity_annual,
-        annual_ctc: data.annual_ctc,
-        tax_breakdown: data.tax_breakdown
-      };
-      displayResults(currentData);
-      drawChart(currentData);
-      if (data.tax_breakdown) {
-        renderTaxBreakdown(data.tax_breakdown);
-      }
+    if (!res.ok) {
+      throw new Error(data.error || "Unknown error");
     }
+    
+    currentData = {
+      in_hand_monthly: data.in_hand_monthly,
+      gross_monthly: data.gross_monthly,
+      monthly_tax: data.monthly_tax,
+      employee_epf: data.employee_epf,
+      employer_epf: data.employer_epf,
+      professional_tax: data.professional_tax,
+      gratuity_annual: data.gratuity_annual,
+      annual_ctc: data.annual_ctc
+    };
+    
+    displayResults(currentData);
+    drawChart(currentData);
+    
   } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Calculation failed. Try again later.</p>`;
-    console.error(err);
+    outputDiv.innerHTML = `<p class="error">❌ Error: ${err.message}</p>`;
+    console.error("Calculation error:", err);
   }
 });
 
