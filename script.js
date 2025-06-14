@@ -159,7 +159,7 @@ function drawChart(data) {
     "Monthly Salary Breakdown" : 
     "Annual Salary Breakdown";
 
-  // Improved color palette
+  // Enhanced color palette
   const backgroundColors = [
     "rgba(76, 175, 80, 0.9)",    // Take-home - green
     "rgba(244, 67, 54, 0.9)",    // Income tax - red
@@ -238,7 +238,13 @@ function drawChart(data) {
           bodyFont: {
             size: 14,
             family: "'Inter', sans-serif"
-          }
+          },
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: '#2c3e50',
+          bodyColor: '#2c3e50',
+          borderColor: 'rgba(0, 0, 0, 0.1)',
+          borderWidth: 1,
+          displayColors: false
         },
         datalabels: {
           color: "#fff",
@@ -276,6 +282,14 @@ function drawChart(data) {
           },
           grid: {
             color: 'rgba(0, 0, 0, 0.05)'
+          },
+          title: {
+            display: true,
+            text: 'Amount (₹)',
+            font: {
+              family: "'Inter', sans-serif",
+              size: 13
+            }
           }
         },
         x: {
@@ -293,6 +307,16 @@ function drawChart(data) {
     },
     plugins: [ChartDataLabels]
   });
+  
+  // Add bar chart specific styling
+  if (currentChartType === 'bar') {
+    currentChart.options.elements = {
+      bar: {
+        borderRadius: 6,
+        borderSkipped: false,
+      }
+    };
+  }
 }
 
 // 📈 Render tax breakdown
