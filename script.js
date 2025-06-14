@@ -11,14 +11,15 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
   const outputDiv = document.getElementById("output");
   
   if (isNaN(desiredSalary) || desiredSalary <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid salary</p>`;
+    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid salary amount</p>`;
     return;
   }
   
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
+  document.getElementById("taxBreakdown").classList.add("hidden");
   
   try {
-    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {
+    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {  
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -28,17 +29,19 @@ document.getElementById("salaryForm").addEventListener("submit", async e => {
     });
     
     const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Unknown error");
+    if (data.error) {
+      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
+    } else {
+      currentData = data;
+      displayResults(data);
+      drawChart(data);
+      if (data.tax_breakdown) {
+        renderTaxBreakdown(data.tax_breakdown);
+      }
     }
-    
-    currentData = data;
-    displayResults(data);
-    drawChart(data);
-    
   } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Error: ${err.message}</p>`;
-    console.error("Calculation error:", err);
+    outputDiv.innerHTML = `<p class="error">❌ Failed to connect. Try again later.</p>`;
+    console.error(err);
   }
 });
 
@@ -50,11 +53,12 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
   const outputDiv = document.getElementById("output");
   
   if (isNaN(annualCTC) || annualCTC <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC</p>`;
+    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC amount</p>`;
     return;
   }
   
   outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
+  document.getElementById("taxBreakdown").classList.add("hidden");
   
   try {
     const res = await fetch("https://shuan24.pythonanywhere.com/calculate_inhand", {
@@ -67,43 +71,45 @@ document.getElementById("normalForm").addEventListener("submit", async e => {
     });
     
     const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Unknown error");
+    if (data.error) {
+      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
+    } else {
+      currentData = {
+        in_hand_monthly: data.in_hand_monthly,
+        gross_monthly: data.gross_monthly,
+        monthly_tax: data.monthly_tax,
+        employee_epf: data.employee_epf,
+        employer_epf: data.employer_epf,
+        professional_tax: data.professional_tax,
+        gratuity_annual: data.gratuity_annual,
+        annual_ctc: data.annual_ctc,
+        tax_breakdown: data.tax_breakdown
+      };
+      displayResults(currentData);
+      drawChart(currentData);
+      if (data.tax_breakdown) {
+        renderTaxBreakdown(data.tax_breakdown);
+      }
     }
-    
-    currentData = {
-      in_hand_monthly: data.in_hand_monthly,
-      gross_monthly: data.gross_monthly,
-      monthly_tax: data.monthly_tax,
-      employee_epf: data.employee_epf,
-      employer_epf: data.employer_epf,
-      professional_tax: data.professional_tax,
-      gratuity_annual: data.gratuity_annual,
-      annual_ctc: data.annual_ctc
-    };
-    
-    displayResults(currentData);
-    drawChart(currentData);
-    
   } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Error: ${err.message}</p>`;
-    console.error("Calculation error:", err);
+    outputDiv.innerHTML = `<p class="error">❌ Calculation failed. Try again later.</p>`;
+    console.error(err);
   }
 });
 
-// 📌 Chart type toggle
+// 📌 Chart type toggle (Pie ↔ Bar)
 document.getElementById("chartToggle").addEventListener("change", () => {
   currentChartType = document.getElementById("chartToggle").checked ? "bar" : "pie";
   if (Object.keys(currentData).length) drawChart(currentData);
 });
 
-// 📌 View mode toggle
+// 📌 View mode toggle (Monthly ↔ Annual)
 document.getElementById("viewToggle").addEventListener("change", () => {
   currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
   if (Object.keys(currentData).length) drawChart(currentData);
 });
 
-// 📌 Render results
+// 📌 Render the textual breakdown result
 function displayResults(data) {
   const isReverse = data.desired_in_hand !== undefined;
   
@@ -122,18 +128,36 @@ function displayResults(data) {
       <li class="highlight"><strong>Total CTC:</strong> ${formatINR(data.annual_ctc)}/year</li>
     </ul>
   `;
+  
+  // Show tax breakdown if available
+  if (data.tax_breakdown) {
+    renderTaxBreakdown(data.tax_breakdown);
+  }
 }
 
-// 📊 Draw chart
+// 📊 Draw the Pie/Bar chart
 function drawChart(data) {
   const ctx = document.getElementById("salaryChart").getContext("2d");
   if (currentChart) currentChart.destroy();
 
+  // Use in-hand or gross salary based on calculator type
   const inHandValue = data.in_hand_monthly || data.desired_in_hand;
+  
   const labels = ["Take‑Home", "Income Tax", "Employee EPF", "Prof. Tax"];
-  const rawValues = [inHandValue, data.monthly_tax, data.employee_epf, data.professional_tax];
-  const values = currentView === "monthly" ? rawValues : rawValues.map(v => v * 12);
-  const title = currentView === "monthly" ? "Monthly Breakdown" : "Annual Breakdown";
+  const rawValues = [
+    inHandValue, 
+    data.monthly_tax, 
+    data.employee_epf, 
+    data.professional_tax
+  ];
+  
+  const values = currentView === "monthly" ? 
+    rawValues : 
+    rawValues.map(v => v * 12);
+  
+  const title = currentView === "monthly" ? 
+    "Monthly Salary Breakdown" : 
+    "Annual Salary Breakdown";
 
   currentChart = new Chart(ctx, {
     type: currentChartType,
@@ -141,7 +165,7 @@ function drawChart(data) {
       labels,
       datasets: [{
         data: values,
-        backgroundColor: ["#4caf50", "#f44336", "#ff9800", "#2196f3"]
+        backgroundColor: ["#4CAF50", "#F44336", "#FF9800", "#2196F3"]
       }]
     },
     options: {
@@ -153,13 +177,18 @@ function drawChart(data) {
           font: { size: 18 },
           padding: { top: 10, bottom: 20 }
         },
-        legend: { position: "bottom" },
+        legend: { 
+          position: "bottom",
+          labels: {
+            font: { size: 14 }
+          }
+        },
         datalabels: {
           color: "#fff",
           font: { weight: "bold", size: 14 },
           formatter: (v, ctx) => {
             const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            return ((v / total) * 100).toFixed(1) + "%";
+            return total > 0 ? ((v / total) * 100).toFixed(1) + "%" : "0%";
           }
         }
       },
@@ -177,6 +206,8 @@ function renderTaxBreakdown(breakdown) {
   
   tbody.innerHTML = "";
   container.classList.remove("hidden");
+  
+  let totalTax = 0;
   
   breakdown.forEach(item => {
     const row = document.createElement("tr");
@@ -205,10 +236,10 @@ function renderTaxBreakdown(breakdown) {
     }
     
     tbody.appendChild(row);
+    totalTax += item.tax;
   });
   
   // Add total row
-  const totalTax = breakdown.reduce((sum, item) => sum + item.tax, 0);
   const totalRow = document.createElement("tr");
   totalRow.classList.add("total-row");
   totalRow.innerHTML = `
@@ -221,10 +252,10 @@ function renderTaxBreakdown(breakdown) {
 // 💱 Format INR currency
 function formatINR(amount) {
   // Handle very large numbers with abbreviations
-  if (amount >= 10000000) {
+  if (Math.abs(amount) >= 10000000) {
     return '₹' + (amount / 10000000).toFixed(1) + ' Cr';
   }
-  if (amount >= 100000) {
+  if (Math.abs(amount) >= 100000) {
     return '₹' + (amount / 100000).toFixed(1) + ' L';
   }
   
