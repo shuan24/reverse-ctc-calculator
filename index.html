@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Indian CTC ↔ In-hand Calculator (FY 2025-26)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -22,13 +22,33 @@
 
     <!-- 💼 CTC → In-hand Calculator -->
     <form id="normalForm">
-      <input type="number" id="inputCTC" placeholder="Enter annual CTC (e.g. 1500000)" required />
+      <div class="form-group">
+        <label for="inputCTC">Annual CTC</label>
+        <input type="number" id="inputCTC" placeholder="e.g. 1500000" required />
+      </div>
+      <div class="form-group">
+        <label for="basicPercentNormal">Basic Salary %</label>
+        <div class="slider-container">
+          <input type="range" id="basicPercentNormal" min="20" max="70" value="40" step="5" />
+          <span id="basicPercentNormalValue">40%</span>
+        </div>
+      </div>
       <button type="submit">Calculate</button>
     </form>
 
     <!-- 🔁 In-hand → CTC Calculator -->
     <form id="salaryForm" style="display: none;">
-      <input type="number" id="desiredSalary" placeholder="Enter desired monthly in-hand (e.g. 80000)" required />
+      <div class="form-group">
+        <label for="desiredSalary">Desired Monthly In-hand</label>
+        <input type="number" id="desiredSalary" placeholder="e.g. 80000" required />
+      </div>
+      <div class="form-group">
+        <label for="basicPercentReverse">Basic Salary %</label>
+        <div class="slider-container">
+          <input type="range" id="basicPercentReverse" min="20" max="70" value="40" step="5" />
+          <span id="basicPercentReverseValue">40%</span>
+        </div>
+      </div>
       <button type="submit">Calculate</button>
     </form>
 
@@ -60,14 +80,29 @@
     <div id="chartContainer">
       <canvas id="salaryChart"></canvas>
     </div>
+
+    <!-- 📊 Tax Breakdown -->
+    <div id="taxBreakdown" class="hidden">
+      <h3>Income Tax Breakdown</h3>
+      <table id="taxTable">
+        <thead>
+          <tr>
+            <th>Income Slab</th>
+            <th>Tax Rate</th>
+            <th>Tax Amount</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 📜 Footer -->
   <footer class="info-footer">
     <p>
       <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br />
-      Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic (capped at ₹15,000/month)<br />
-      Basic Salary = 40% of Gross | Gratuity = (Basic × 15) / 26
+      Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic<br />
+      Gratuity = (Basic × 15) / 26
     </p>
   </footer>
 
@@ -85,6 +120,7 @@
       normalForm.style.display = 'block';
       salaryForm.style.display = 'none';
       document.getElementById('output').innerHTML = '';
+      document.getElementById('taxBreakdown').classList.add('hidden');
       if (currentChart) currentChart.destroy();
     });
 
@@ -94,7 +130,17 @@
       normalForm.style.display = 'none';
       salaryForm.style.display = 'block';
       document.getElementById('output').innerHTML = '';
+      document.getElementById('taxBreakdown').classList.add('hidden');
       if (currentChart) currentChart.destroy();
+    });
+
+    // Basic % slider handlers
+    document.getElementById('basicPercentNormal').addEventListener('input', function() {
+      document.getElementById('basicPercentNormalValue').textContent = this.value + '%';
+    });
+
+    document.getElementById('basicPercentReverse').addEventListener('input', function() {
+      document.getElementById('basicPercentReverseValue').textContent = this.value + '%';
     });
   </script>
   <script src="script.js"></script>
