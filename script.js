@@ -184,23 +184,42 @@ function renderTaxBreakdown(breakdown) {
   tbody.innerHTML = "";
   container.classList.remove("hidden");
   
-  breakdown.forEach(slab => {
+  breakdown.forEach(item => {
     const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${formatINR(slab.start)} - ${formatINR(slab.end)}</td>
-      <td>${(slab.rate * 100).toFixed(0)}%</td>
-      <td>${formatINR(slab.tax)}</td>
-    `;
+    
+    if (item.description) {
+      // Special row for rebate/cess
+      row.innerHTML = `
+        <td colspan="2"><strong>${item.description}</strong></td>
+        <td>${formatINR(item.tax)}</td>
+      `;
+    } else {
+      // Regular slab row
+      const slabRange = item.end === 0 ? 
+        `Above ${formatINR(item.start)}` :
+        `${formatINR(item.start)} - ${formatINR(item.end)}`;
+      
+      const taxRate = item.rate < 0 ? 
+        "Rebate" : 
+        `${(item.rate * 100).toFixed(0)}%`;
+      
+      row.innerHTML = `
+        <td>${slabRange}</td>
+        <td>${taxRate}</td>
+        <td>${formatINR(item.tax)}</td>
+      `;
+    }
+    
     tbody.appendChild(row);
   });
   
   // Add total row
+  const totalTax = breakdown.reduce((sum, item) => sum + item.tax, 0);
   const totalRow = document.createElement("tr");
   totalRow.classList.add("total-row");
   totalRow.innerHTML = `
-    <td><strong>Total Tax</strong></td>
-    <td></td>
-    <td><strong>${formatINR(breakdown.reduce((sum, slab) => sum + slab.tax, 0))}</strong></td>
+    <td colspan="2"><strong>Total Tax</strong></td>
+    <td><strong>${formatINR(totalTax)}</strong></td>
   `;
   tbody.appendChild(totalRow);
 }
