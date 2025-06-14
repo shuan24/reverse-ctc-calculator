@@ -159,13 +159,39 @@ function drawChart(data) {
     "Monthly Salary Breakdown" : 
     "Annual Salary Breakdown";
 
+  // Improved color palette
+  const backgroundColors = [
+    "rgba(76, 175, 80, 0.9)",    // Take-home - green
+    "rgba(244, 67, 54, 0.9)",    // Income tax - red
+    "rgba(255, 152, 0, 0.9)",    // EPF - orange
+    "rgba(33, 150, 243, 0.9)"    // Prof tax - blue
+  ];
+  
+  const borderColors = [
+    "rgba(76, 175, 80, 1)",
+    "rgba(244, 67, 54, 1)",
+    "rgba(255, 152, 0, 1)",
+    "rgba(33, 150, 243, 1)"
+  ];
+  
+  const hoverBackgroundColors = [
+    "rgba(76, 175, 80, 1)",
+    "rgba(244, 67, 54, 1)",
+    "rgba(255, 152, 0, 1)",
+    "rgba(33, 150, 243, 1)"
+  ];
+
   currentChart = new Chart(ctx, {
     type: currentChartType,
     data: {
       labels,
       datasets: [{
         data: values,
-        backgroundColor: ["#4CAF50", "#F44336", "#FF9800", "#2196F3"]
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
+        borderWidth: 2,
+        hoverBackgroundColor: hoverBackgroundColors,
+        hoverBorderWidth: 3
       }]
     },
     options: {
@@ -174,26 +200,96 @@ function drawChart(data) {
         title: { 
           display: true, 
           text: title, 
-          font: { size: 18 },
-          padding: { top: 10, bottom: 20 }
+          font: { 
+            size: 18,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          },
+          padding: { top: 10, bottom: 20 },
+          color: '#2c3e50'
         },
         legend: { 
           position: "bottom",
           labels: {
-            font: { size: 14 }
+            font: {
+              size: 14,
+              family: "'Inter', sans-serif"
+            },
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${formatINR(value)} (${percentage}%)`;
+            }
+          },
+          padding: 12,
+          titleFont: {
+            size: 14,
+            family: "'Inter', sans-serif"
+          },
+          bodyFont: {
+            size: 14,
+            family: "'Inter', sans-serif"
           }
         },
         datalabels: {
           color: "#fff",
-          font: { weight: "bold", size: 14 },
+          font: { 
+            weight: "bold", 
+            size: 14,
+            family: "'Inter', sans-serif"
+          },
+          textStrokeColor: 'rgba(0,0,0,0.5)',
+          textStrokeWidth: 2,
+          padding: 6,
           formatter: (v, ctx) => {
             const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            return total > 0 ? ((v / total) * 100).toFixed(1) + "%" : "0%";
+            return total > 0 ? Math.round((v / total) * 100) + "%" : "0%";
           }
         }
       },
-      animation: { animateRotate: true, animateScale: true },
-      maintainAspectRatio: false
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      maintainAspectRatio: false,
+      // For bar chart specific options
+      scales: currentChartType === 'bar' ? {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return formatINR(value).replace('₹', '');
+            },
+            font: {
+              family: "'Inter', sans-serif",
+              size: 12
+            }
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              family: "'Inter', sans-serif",
+              size: 12
+            }
+          }
+        }
+      } : {}
     },
     plugins: [ChartDataLabels]
   });
