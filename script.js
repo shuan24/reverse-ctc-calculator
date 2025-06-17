@@ -1,380 +1,225 @@
-let currentChart;
-let currentData = {};
-let currentView = "monthly";
-let currentChartType = "pie";
+// Tab toggle logic
+const tabCTC = document.getElementById('tabCTC');
+const tabReverse = document.getElementById('tabReverse');
+const normalForm = document.getElementById('normalForm');
+const salaryForm = document.getElementById('salaryForm');
+const resultsContainer = document.getElementById('resultsContainer');
 
-// 📌 Reverse CTC: In-Hand → CTC
-document.getElementById("salaryForm").addEventListener("submit", async e => {
+tabCTC.addEventListener('click', () => {
+  tabCTC.classList.add('active-tab');
+  tabReverse.classList.remove('active-tab');
+  normalForm.style.display = 'block';
+  salaryForm.style.display = 'none';
+  resultsContainer.classList.add('hidden');
+});
+
+tabReverse.addEventListener('click', () => {
+  tabReverse.classList.add('active-tab');
+  tabCTC.classList.remove('active-tab');
+  normalForm.style.display = 'none';
+  salaryForm.style.display = 'block';
+  resultsContainer.classList.add('hidden');
+});
+
+// Basic % slider handlers
+document.getElementById('basicPercentNormal').addEventListener('input', function() {
+  document.getElementById('basicPercentNormalValue').textContent = this.value + '%';
+});
+
+document.getElementById('hraPercentNormal').addEventListener('input', function() {
+  document.getElementById('hraPercentNormalValue').textContent = this.value + '%';
+});
+
+document.getElementById('basicPercentReverse').addEventListener('input', function() {
+  document.getElementById('basicPercentReverseValue').textContent = this.value + '%';
+});
+
+// Form submission handlers
+normalForm.addEventListener('submit', function(e) {
   e.preventDefault();
-  const desiredSalary = parseFloat(document.getElementById("desiredSalary").value);
-  const basicPercent = parseFloat(document.getElementById("basicPercentReverse").value) / 100;
-  const outputDiv = document.getElementById("output");
-  
-  if (isNaN(desiredSalary) || desiredSalary <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid salary amount</p>`;
-    return;
-  }
-  
-  outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
-  document.getElementById("taxBreakdown").classList.add("hidden");
-  
-  try {
-    const res = await fetch("https://shuan24.pythonanywhere.com/calculate", {  
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        in_hand: desiredSalary,
-        basic_percent: basicPercent 
-      })
-    });
-    
-    const data = await res.json();
-    if (data.error) {
-      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
-    } else {
-      currentData = data;
-      displayResults(data);
-      drawChart(data);
-      if (data.tax_breakdown) {
-        renderTaxBreakdown(data.tax_breakdown);
-      }
-    }
-  } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Failed to connect. Try again later.</p>`;
-    console.error(err);
-  }
+  calculateCTCToInhand();
 });
 
-// 📌 Normal CTC: CTC → In-Hand
-document.getElementById("normalForm").addEventListener("submit", async e => {
+salaryForm.addEventListener('submit', function(e) {
   e.preventDefault();
-  const annualCTC = parseFloat(document.getElementById("inputCTC").value);
-  const basicPercent = parseFloat(document.getElementById("basicPercentNormal").value) / 100;
-  const outputDiv = document.getElementById("output");
-  
-  if (isNaN(annualCTC) || annualCTC <= 0) {
-    outputDiv.innerHTML = `<p class="error">❌ Please enter a valid CTC amount</p>`;
-    return;
-  }
-  
-  outputDiv.innerHTML = `<p class="loading">⏳ Calculating...</p>`;
-  document.getElementById("taxBreakdown").classList.add("hidden");
-  
-  try {
-    const res = await fetch("https://shuan24.pythonanywhere.com/calculate_inhand", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        ctc: annualCTC,
-        basic_percent: basicPercent
-      })
-    });
-    
-    const data = await res.json();
-    if (data.error) {
-      outputDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
-    } else {
-      currentData = {
-        in_hand_monthly: data.in_hand_monthly,
-        gross_monthly: data.gross_monthly,
-        monthly_tax: data.monthly_tax,
-        employee_epf: data.employee_epf,
-        employer_epf: data.employer_epf,
-        professional_tax: data.professional_tax,
-        gratuity_annual: data.gratuity_annual,
-        annual_ctc: data.annual_ctc,
-        tax_breakdown: data.tax_breakdown
-      };
-      displayResults(currentData);
-      drawChart(currentData);
-      if (data.tax_breakdown) {
-        renderTaxBreakdown(data.tax_breakdown);
-      }
-    }
-  } catch (err) {
-    outputDiv.innerHTML = `<p class="error">❌ Calculation failed. Try again later.</p>`;
-    console.error(err);
-  }
+  calculateInhandToCTC();
 });
 
-// 📌 Chart type toggle (Pie ↔ Bar)
-document.getElementById("chartToggle").addEventListener("change", () => {
-  currentChartType = document.getElementById("chartToggle").checked ? "bar" : "pie";
-  if (Object.keys(currentData).length) drawChart(currentData);
-});
-
-// 📌 View mode toggle (Monthly ↔ Annual)
-document.getElementById("viewToggle").addEventListener("change", () => {
-  currentView = document.getElementById("viewToggle").checked ? "annual" : "monthly";
-  if (Object.keys(currentData).length) drawChart(currentData);
-});
-
-// 📌 Render the textual breakdown result
-function displayResults(data) {
-  const isReverse = data.desired_in_hand !== undefined;
-  
-  document.getElementById("output").innerHTML = `
-    <h3>Results</h3>
-    <ul class="result">
-      ${isReverse ? 
-        `<li><strong>Desired In-Hand:</strong> ${formatINR(data.desired_in_hand)}/month</li>` : 
-        `<li><strong>In-Hand Salary:</strong> ${formatINR(data.in_hand_monthly)}/month</li>`}
-      <li><strong>Gross Salary:</strong> ${formatINR(data.gross_monthly)}/month</li>
-      <li><strong>Income Tax:</strong> ${formatINR(data.monthly_tax)}/month</li>
-      <li><strong>Employee EPF:</strong> ${formatINR(data.employee_epf)}/month</li>
-      <li><strong>Employer EPF:</strong> ${formatINR(data.employer_epf)}/month</li>
-      <li><strong>Professional Tax:</strong> ${formatINR(data.professional_tax)}/month</li>
-      <li><strong>Gratuity:</strong> ${formatINR(data.gratuity_annual)}/year</li>
-      <li class="highlight"><strong>Total CTC:</strong> ${formatINR(data.annual_ctc)}/year</li>
-    </ul>
-  `;
-  
-  // Show tax breakdown if available
-  if (data.tax_breakdown) {
-    renderTaxBreakdown(data.tax_breakdown);
-  }
-}
-
-// 📊 Draw the Pie/Bar chart
-function drawChart(data) {
-  const ctx = document.getElementById("salaryChart").getContext("2d");
-  if (currentChart) currentChart.destroy();
-
-  // Use in-hand or gross salary based on calculator type
-  const inHandValue = data.in_hand_monthly || data.desired_in_hand;
-  
-  const labels = ["Take‑Home", "Income Tax", "Employee EPF", "Prof. Tax"];
-  const rawValues = [
-    inHandValue, 
-    data.monthly_tax, 
-    data.employee_epf, 
-    data.professional_tax
-  ];
-  
-  const values = currentView === "monthly" ? 
-    rawValues : 
-    rawValues.map(v => v * 12);
-  
-  const title = currentView === "monthly" ? 
-    "Monthly Salary Breakdown" : 
-    "Annual Salary Breakdown";
-
-  // Enhanced color palette
-  const backgroundColors = [
-    "rgba(76, 175, 80, 0.9)",    // Take-home - green
-    "rgba(244, 67, 54, 0.9)",    // Income tax - red
-    "rgba(255, 152, 0, 0.9)",    // EPF - orange
-    "rgba(33, 150, 243, 0.9)"    // Prof tax - blue
-  ];
-  
-  const borderColors = [
-    "rgba(76, 175, 80, 1)",
-    "rgba(244, 67, 54, 1)",
-    "rgba(255, 152, 0, 1)",
-    "rgba(33, 150, 243, 1)"
-  ];
-  
-  const hoverBackgroundColors = [
-    "rgba(76, 175, 80, 1)",
-    "rgba(244, 67, 54, 1)",
-    "rgba(255, 152, 0, 1)",
-    "rgba(33, 150, 243, 1)"
-  ];
-
-  currentChart = new Chart(ctx, {
-    type: currentChartType,
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: backgroundColors,
-        borderColor: borderColors,
-        borderWidth: 2,
-        hoverBackgroundColor: hoverBackgroundColors,
-        hoverBorderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        title: { 
-          display: true, 
-          text: title, 
-          font: { 
-            size: 18,
-            weight: 'bold',
-            family: "'Inter', sans-serif"
-          },
-          padding: { top: 10, bottom: 20 },
-          color: '#2c3e50'
-        },
-        legend: { 
-          position: "bottom",
-          labels: {
-            font: {
-              size: 14,
-              family: "'Inter', sans-serif"
-            },
-            padding: 20,
-            usePointStyle: true,
-            pointStyle: 'circle'
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${formatINR(value)} (${percentage}%)`;
-            }
-          },
-          padding: 12,
-          titleFont: {
-            size: 14,
-            family: "'Inter', sans-serif"
-          },
-          bodyFont: {
-            size: 14,
-            family: "'Inter', sans-serif"
-          },
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          titleColor: '#2c3e50',
-          bodyColor: '#2c3e50',
-          borderColor: 'rgba(0, 0, 0, 0.1)',
-          borderWidth: 1,
-          displayColors: false
-        },
-        datalabels: {
-          color: "#fff",
-          font: { 
-            weight: "bold", 
-            size: 14,
-            family: "'Inter', sans-serif"
-          },
-          textStrokeColor: 'rgba(0,0,0,0.5)',
-          textStrokeWidth: 2,
-          padding: 6,
-          formatter: (v, ctx) => {
-            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            return total > 0 ? Math.round((v / total) * 100) + "%" : "0%";
-          }
-        }
-      },
-      animation: {
-        duration: 1000,
-        easing: 'easeOutQuart'
-      },
-      maintainAspectRatio: false,
-      // For bar chart specific options
-      scales: currentChartType === 'bar' ? {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return formatINR(value).replace('₹', '');
-            },
-            font: {
-              family: "'Inter', sans-serif",
-              size: 12
-            }
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          },
-          title: {
-            display: true,
-            text: 'Amount (₹)',
-            font: {
-              family: "'Inter', sans-serif",
-              size: 13
-            }
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              family: "'Inter', sans-serif",
-              size: 12
-            }
-          }
-        }
-      } : {}
-    },
-    plugins: [ChartDataLabels]
-  });
-  
-  // Add bar chart specific styling
-  if (currentChartType === 'bar') {
-    currentChart.options.elements = {
-      bar: {
-        borderRadius: 6,
-        borderSkipped: false,
-      }
-    };
-  }
-}
-
-// 📈 Render tax breakdown
-function renderTaxBreakdown(breakdown) {
-  const container = document.getElementById("taxBreakdown");
-  const tbody = document.querySelector("#taxTable tbody");
-  
-  tbody.innerHTML = "";
-  container.classList.remove("hidden");
-  
-  let totalTax = 0;
-  
-  breakdown.forEach(item => {
-    const row = document.createElement("tr");
-    
-    if (item.description) {
-      // Special row for rebate/cess
-      row.innerHTML = `
-        <td colspan="2"><strong>${item.description}</strong></td>
-        <td>${formatINR(item.tax)}</td>
-      `;
-    } else {
-      // Regular slab row
-      const slabRange = item.end === 0 ? 
-        `Above ${formatINR(item.start)}` :
-        `${formatINR(item.start)} - ${formatINR(item.end)}`;
-      
-      const taxRate = item.rate < 0 ? 
-        "Rebate" : 
-        `${(item.rate * 100).toFixed(0)}%`;
-      
-      row.innerHTML = `
-        <td>${slabRange}</td>
-        <td>${taxRate}</td>
-        <td>${formatINR(item.tax)}</td>
-      `;
-    }
-    
-    tbody.appendChild(row);
-    totalTax += item.tax;
-  });
-  
-  // Add total row
-  const totalRow = document.createElement("tr");
-  totalRow.classList.add("total-row");
-  totalRow.innerHTML = `
-    <td colspan="2"><strong>Total Tax</strong></td>
-    <td><strong>${formatINR(totalTax)}</strong></td>
-  `;
-  tbody.appendChild(totalRow);
-}
-
-// 💱 Format INR currency (exact amounts)
+// Format currency in Indian Rupees
 function formatINR(amount) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(amount);
 }
+
+// Render tax slabs
+function renderTaxSlabs(slabs) {
+  const container = document.getElementById('taxSlabsContainer');
+  container.innerHTML = '';
+  
+  slabs.forEach(slab => {
+    const row = document.createElement('div');
+    row.className = 'slab-row';
+    
+    row.innerHTML = `
+      <span>${slab.range}</span>
+      <span>${slab.rate}</span>
+      <span>${slab.amount}</span>
+    `;
+    
+    container.appendChild(row);
+  });
+}
+
+// CTC to In-hand calculation
+async function calculateCTCToInhand() {
+  // Get input values
+  const ctc = parseFloat(document.getElementById('inputCTC').value) || 0;
+  const basicPercent = parseFloat(document.getElementById('basicPercentNormal').value) / 100;
+  const hraPercent = parseFloat(document.getElementById('hraPercentNormal').value) / 100;
+  const bonus = parseFloat(document.getElementById('bonusNormal').value) || 0;
+  const allowances = parseFloat(document.getElementById('otherAllowancesNormal').value) || 0;
+  
+  // Show loading state
+  resultsContainer.classList.add('hidden');
+  document.getElementById('resultTitle').textContent = "Calculating...";
+  
+  try {
+    const response = await fetch('https://shuan24.pythonanywhere.com/ctc-to-inhand', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ctc: ctc,
+        basic_percent: basicPercent * 100, // convert to percentage
+        hra_percent: hraPercent * 100,
+        bonus: bonus,
+        other_allowances: allowances
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      alert(`Error: ${data.error}`);
+      return;
+    }
+    
+    // Update UI with results
+    document.getElementById('resultTitle').textContent = "Salary Breakdown (CTC to In-hand)";
+    document.getElementById('resultMainTitle').textContent = "Monthly In-hand";
+    document.getElementById('resultMainValue').textContent = formatINR(data.monthly_inhand);
+    document.getElementById('resultAnnualValue').textContent = formatINR(data.annual_inhand);
+    
+    // Components
+    document.getElementById('basicValue').textContent = formatINR(data.components.basic);
+    document.getElementById('hraValue').textContent = formatINR(data.components.hra);
+    document.getElementById('bonusValue').textContent = formatINR(data.components.bonus);
+    document.getElementById('allowancesValue').textContent = formatINR(data.components.other_allowances);
+    document.getElementById('grossValue').textContent = formatINR(data.components.gross_salary);
+    
+    // Deductions
+    document.getElementById('epfValue').textContent = formatINR(data.components.employee_pf);
+    document.getElementById('ptValue').textContent = formatINR(data.components.professional_tax);
+    document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
+    document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
+    
+    // Tax breakdown
+    const taxSlabs = data.tax_breakdown.map(item => {
+      return {
+        range: item.range || item.description || "Tax",
+        rate: item.rate || "-",
+        amount: formatINR(item.tax)
+      };
+    });
+    
+    renderTaxSlabs(taxSlabs);
+    document.getElementById('totalTaxValue').textContent = formatINR(data.components.income_tax);
+    
+    resultsContainer.classList.remove('hidden');
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to calculate salary. Please try again.');
+  }
+}
+
+// In-hand to CTC calculation
+async function calculateInhandToCTC() {
+  // Get input values
+  const monthlyInhand = parseFloat(document.getElementById('desiredSalary').value) || 0;
+  const basicPercent = parseFloat(document.getElementById('basicPercentReverse').value) / 100;
+  const bonus = parseFloat(document.getElementById('bonusReverse').value) || 0;
+  const allowances = parseFloat(document.getElementById('otherAllowancesReverse').value) || 0;
+  
+  // Show loading state
+  resultsContainer.classList.add('hidden');
+  document.getElementById('resultTitle').textContent = "Calculating...";
+  
+  try {
+    const response = await fetch('https://shuan24.pythonanywhere.com/inhand-to-ctc', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        monthly_inhand: monthlyInhand,
+        annual_basic: 0, // We'll calculate based on percentage
+        bonus: bonus,
+        other_allowances: allowances,
+        basic_percent: basicPercent * 100 // convert to percentage
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      alert(`Error: ${data.error}`);
+      return;
+    }
+    
+    // Update UI with results
+    document.getElementById('resultTitle').textContent = "CTC Calculation (In-hand to CTC)";
+    document.getElementById('resultMainTitle').textContent = "Annual CTC";
+    document.getElementById('resultMainValue').textContent = formatINR(data.ctc);
+    document.getElementById('resultAnnualValue').textContent = formatINR(data.monthly_gross * 12);
+    
+    // Components
+    document.getElementById('basicValue').textContent = formatINR(data.components.basic);
+    document.getElementById('hraValue').textContent = formatINR(data.components.hra);
+    document.getElementById('bonusValue').textContent = formatINR(data.components.bonus);
+    document.getElementById('allowancesValue').textContent = formatINR(data.components.other_allowances);
+    document.getElementById('grossValue').textContent = formatINR(data.components.gross_salary);
+    
+    // Deductions
+    document.getElementById('epfValue').textContent = formatINR(data.components.employee_pf);
+    document.getElementById('ptValue').textContent = formatINR(data.components.professional_tax);
+    document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
+    document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
+    
+    // Tax breakdown
+    const taxSlabs = data.tax_breakdown.map(item => {
+      return {
+        range: item.range || item.description || "Tax",
+        rate: item.rate || "-",
+        amount: formatINR(item.tax)
+      };
+    });
+    
+    renderTaxSlabs(taxSlabs);
+    document.getElementById('totalTaxValue').textContent = formatINR(data.components.income_tax);
+    
+    resultsContainer.classList.remove('hidden');
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to calculate CTC. Please try again.');
+  }
+}
+
+// Initialize with sample values
+document.getElementById('basicPercentNormalValue').textContent = '40%';
+document.getElementById('hraPercentNormalValue').textContent = '50%';
+document.getElementById('basicPercentReverseValue').textContent = '40%';
