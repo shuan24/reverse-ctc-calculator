@@ -6,143 +6,180 @@
   <title>Indian CTC ↔ In-hand Calculator (FY 2025-26)</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Indian CTC ↔ In-hand Salary Calculator</h1>
-    <p class="subtitle">FY 2025-26 (New Tax Regime)</p>
+    <header>
+      <h1>Indian CTC ↔ In-hand Salary Calculator</h1>
+      <p class="subtitle">FY 2025-26 (New Tax Regime)</p>
+    </header>
 
-    <!-- 🔁 Tab Switcher -->
+    <!-- Tab Switcher -->
     <div class="tab-buttons">
       <button id="tabCTC" class="active-tab">CTC → In-hand</button>
       <button id="tabReverse">In-hand → CTC</button>
     </div>
 
-    <!-- 💼 CTC → In-hand Calculator -->
+    <!-- CTC → In-hand Calculator -->
     <form id="normalForm">
       <div class="form-group">
-        <label for="inputCTC">Annual CTC</label>
-        <input type="number" id="inputCTC" placeholder="e.g. 1500000" required />
+        <label for="inputCTC">Annual CTC (₹)</label>
+        <input type="number" id="inputCTC" placeholder="e.g. 1500000" required value="1200000" />
       </div>
+      
       <div class="form-group">
-        <label for="basicPercentNormal">Basic Salary %</label>
+        <label for="basicPercentNormal">Basic Salary % of CTC</label>
         <div class="slider-container">
-          <input type="range" id="basicPercentNormal" min="20" max="70" value="40" step="5" />
+          <input type="range" id="basicPercentNormal" min="30" max="70" value="40" step="1" />
           <span id="basicPercentNormalValue">40%</span>
         </div>
       </div>
-      <button type="submit">Calculate</button>
+      
+      <div class="form-group">
+        <label for="hraPercentNormal">HRA % of Basic</label>
+        <div class="slider-container">
+          <input type="range" id="hraPercentNormal" min="0" max="100" value="50" step="1" />
+          <span id="hraPercentNormalValue">50%</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="bonusNormal">Annual Bonus (₹)</label>
+        <input type="number" id="bonusNormal" placeholder="e.g. 50000" value="50000" />
+      </div>
+      
+      <div class="form-group">
+        <label for="otherAllowancesNormal">Other Allowances (₹)</label>
+        <input type="number" id="otherAllowancesNormal" placeholder="e.g. 30000" value="30000" />
+      </div>
+      
+      <button type="submit">Calculate In-hand Salary</button>
     </form>
 
-    <!-- 🔁 In-hand → CTC Calculator -->
+    <!-- In-hand → CTC Calculator -->
     <form id="salaryForm" style="display: none;">
       <div class="form-group">
-        <label for="desiredSalary">Desired Monthly In-hand</label>
-        <input type="number" id="desiredSalary" placeholder="e.g. 80000" required />
+        <label for="desiredSalary">Monthly In-hand Salary (₹)</label>
+        <input type="number" id="desiredSalary" placeholder="e.g. 80000" required value="75000" />
       </div>
+      
       <div class="form-group">
-        <label for="basicPercentReverse">Basic Salary %</label>
+        <label for="basicPercentReverse">Basic Salary % of CTC</label>
         <div class="slider-container">
-          <input type="range" id="basicPercentReverse" min="20" max="70" value="40" step="5" />
+          <input type="range" id="basicPercentReverse" min="30" max="70" value="40" step="1" />
           <span id="basicPercentReverseValue">40%</span>
         </div>
       </div>
-      <button type="submit">Calculate</button>
+      
+      <div class="form-group">
+        <label for="bonusReverse">Annual Bonus (₹)</label>
+        <input type="number" id="bonusReverse" placeholder="e.g. 50000" value="50000" />
+      </div>
+      
+      <div class="form-group">
+        <label for="otherAllowancesReverse">Other Allowances (₹)</label>
+        <input type="number" id="otherAllowancesReverse" placeholder="e.g. 30000" value="30000" />
+      </div>
+      
+      <button type="submit">Calculate CTC</button>
     </form>
 
-    <!-- 📊 Output -->
-    <div id="output"></div>
-
-    <!-- 🔄 Chart and View Toggles -->
-    <div class="custom-toggles">
-      <!-- Toggle for Monthly / Yearly -->
-      <div class="toggle-group view">
-        <label class="toggle-label">Breakdown View</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="viewToggle" />
-          <span class="toggle-slider" data-off="Monthly" data-on="Yearly"></span>
-        </label>
+    <!-- Results Container -->
+    <div id="resultsContainer" class="hidden">
+      <div class="results-header">
+        <h2 id="resultTitle">Salary Breakdown</h2>
+        <div class="result-summary">
+          <div class="result-card">
+            <h3 id="resultMainTitle">Monthly In-hand</h3>
+            <div class="value" id="resultMainValue">₹72,850</div>
+          </div>
+          <div class="result-card">
+            <h3>Annual Equivalent</h3>
+            <div class="value" id="resultAnnualValue">₹8,74,200</div>
+          </div>
+        </div>
       </div>
-
-      <!-- Toggle for Pie / Bar -->
-      <div class="toggle-group chart">
-        <label class="toggle-label">Chart Type</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="chartToggle" />
-          <span class="toggle-slider" data-off="Pie" data-on="Bar"></span>
-        </label>
+      
+      <div class="results-grid">
+        <div class="results-section">
+          <h3>Salary Components</h3>
+          <div class="breakdown-list">
+            <div class="breakdown-item">
+              <span>Basic Salary</span>
+              <span id="basicValue">₹4,80,000</span>
+            </div>
+            <div class="breakdown-item">
+              <span>HRA</span>
+              <span id="hraValue">₹2,40,000</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Bonus</span>
+              <span id="bonusValue">₹50,000</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Other Allowances</span>
+              <span id="allowancesValue">₹30,000</span>
+            </div>
+            <div class="breakdown-item total">
+              <span>Gross Salary</span>
+              <span id="grossValue">₹8,00,000</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="results-section">
+          <h3>Deductions</h3>
+          <div class="breakdown-list">
+            <div class="breakdown-item">
+              <span>Employee PF</span>
+              <span id="epfValue">₹21,600</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Professional Tax</span>
+              <span id="ptValue">₹2,400</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Income Tax</span>
+              <span id="taxValue">₹1,01,800</span>
+            </div>
+            <div class="breakdown-item total">
+              <span>Total Deductions</span>
+              <span id="totalDeductionsValue">₹2,25,800</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- 📈 Chart -->
-    <div id="chartContainer">
-      <canvas id="salaryChart"></canvas>
-    </div>
-
-    <!-- 📊 Tax Breakdown -->
-    <div id="taxBreakdown" class="hidden">
-      <h3>Income Tax Breakdown</h3>
-      <table id="taxTable">
-        <thead>
-          <tr>
-            <th>Income Slab</th>
-            <th>Tax Rate</th>
-            <th>Tax Amount</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      
+      <div class="tax-section">
+        <h3>Income Tax Breakdown (New Regime)</h3>
+        <div class="tax-slab-container">
+          <div class="slab-row header">
+            <span>Income Slab</span>
+            <span>Rate</span>
+            <span>Tax Amount</span>
+          </div>
+          <div id="taxSlabsContainer">
+            <!-- Tax slabs will be inserted here dynamically -->
+          </div>
+          <div class="slab-row total">
+            <span>Total Tax</span>
+            <span></span>
+            <span id="totalTaxValue">₹1,05,872</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- 📜 Footer -->
+  <!-- Footer -->
   <footer class="info-footer">
     <p>
       <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br />
-      Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic<br />
-      Gratuity = (Basic × 15) / 26
+      Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic (capped at ₹15,000/month)<br />
+      Gratuity = (15/26) × Basic per month
     </p>
   </footer>
 
-  <!-- 🧠 Script -->
-  <script>
-    // Tab toggle logic
-    const tabCTC = document.getElementById('tabCTC');
-    const tabReverse = document.getElementById('tabReverse');
-    const normalForm = document.getElementById('normalForm');
-    const salaryForm = document.getElementById('salaryForm');
-
-    tabCTC.addEventListener('click', () => {
-      tabCTC.classList.add('active-tab');
-      tabReverse.classList.remove('active-tab');
-      normalForm.style.display = 'block';
-      salaryForm.style.display = 'none';
-      document.getElementById('output').innerHTML = '';
-      document.getElementById('taxBreakdown').classList.add('hidden');
-      if (currentChart) currentChart.destroy();
-    });
-
-    tabReverse.addEventListener('click', () => {
-      tabReverse.classList.add('active-tab');
-      tabCTC.classList.remove('active-tab');
-      normalForm.style.display = 'none';
-      salaryForm.style.display = 'block';
-      document.getElementById('output').innerHTML = '';
-      document.getElementById('taxBreakdown').classList.add('hidden');
-      if (currentChart) currentChart.destroy();
-    });
-
-    // Basic % slider handlers
-    document.getElementById('basicPercentNormal').addEventListener('input', function() {
-      document.getElementById('basicPercentNormalValue').textContent = this.value + '%';
-    });
-
-    document.getElementById('basicPercentReverse').addEventListener('input', function() {
-      document.getElementById('basicPercentReverseValue').textContent = this.value + '%';
-    });
-  </script>
   <script src="script.js"></script>
 </body>
 </html>
