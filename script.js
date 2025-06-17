@@ -90,7 +90,7 @@ async function calculateCTCToInhand() {
   document.getElementById('resultTitle').textContent = "Calculating...";
   
   try {
-    const response = await fetch('https://shuan24.pythonanywhere.com/ctc-to-inhand', {
+    const response = await fetch('/ctc-to-inhand', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -144,6 +144,15 @@ async function calculateCTCToInhand() {
     
     renderTaxSlabs(taxSlabs);
     document.getElementById('totalTaxValue').textContent = formatINR(data.components.income_tax);
+    
+    // Show CTC adjustment note if needed
+    if (Math.abs(data.calculated_ctc - ctc) > 100) {
+      const note = document.createElement('div');
+      note.className = 'info-box';
+      note.innerHTML = `<p><strong>Note:</strong> Calculated CTC is ${formatINR(data.calculated_ctc)} based on components. 
+                        Input CTC was ${formatINR(ctc)}. Difference is due to rounding and calculation method.</p>`;
+      resultsContainer.appendChild(note);
+    }
     
     resultsContainer.classList.remove('hidden');
   } catch (error) {
