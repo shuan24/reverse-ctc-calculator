@@ -82,6 +82,8 @@ async function calculateCTCToInhand() {
   const hraPercent = parseFloat(document.getElementById('hraPercentNormal').value) / 100;
   const bonus = parseFloat(document.getElementById('bonusNormal').value) || 0;
   const allowances = parseFloat(document.getElementById('otherAllowancesNormal').value) || 0;
+  const employeePF = parseFloat(document.getElementById('employeePFNormal').value) || 0;
+  const employerPF = parseFloat(document.getElementById('employerPFNormal').value) || 0;
   
   // Show loading state
   resultsContainer.classList.add('hidden');
@@ -98,7 +100,9 @@ async function calculateCTCToInhand() {
         basic_percent: basicPercent * 100, // convert to percentage
         hra_percent: hraPercent * 100,
         bonus: bonus,
-        other_allowances: allowances
+        other_allowances: allowances,
+        employee_pf: employeePF,
+        employer_pf: employerPF
       })
     });
     
@@ -124,6 +128,7 @@ async function calculateCTCToInhand() {
     
     // Deductions
     document.getElementById('epfValue').textContent = formatINR(data.components.employee_pf);
+    document.getElementById('employerPFValue').textContent = formatINR(data.components.employer_pf);
     document.getElementById('ptValue').textContent = formatINR(data.components.professional_tax);
     document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
     document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
@@ -154,6 +159,8 @@ async function calculateInhandToCTC() {
   const basicPercent = parseFloat(document.getElementById('basicPercentReverse').value) / 100;
   const bonus = parseFloat(document.getElementById('bonusReverse').value) || 0;
   const allowances = parseFloat(document.getElementById('otherAllowancesReverse').value) || 0;
+  const employeePF = parseFloat(document.getElementById('employeePFReverse').value) || 0;
+  const employerPF = parseFloat(document.getElementById('employerPFReverse').value) || 0;
   
   // Show loading state
   resultsContainer.classList.add('hidden');
@@ -167,10 +174,11 @@ async function calculateInhandToCTC() {
       },
       body: JSON.stringify({
         monthly_inhand: monthlyInhand,
-        annual_basic: 0, // We'll calculate based on percentage
         bonus: bonus,
         other_allowances: allowances,
-        basic_percent: basicPercent * 100 // convert to percentage
+        basic_percent: basicPercent * 100, // convert to percentage
+        employee_pf: employeePF,
+        employer_pf: employerPF
       })
     });
     
@@ -185,7 +193,7 @@ async function calculateInhandToCTC() {
     document.getElementById('resultTitle').textContent = "CTC Calculation (In-hand to CTC)";
     document.getElementById('resultMainTitle').textContent = "Annual CTC";
     document.getElementById('resultMainValue').textContent = formatINR(data.ctc);
-    document.getElementById('resultAnnualValue').textContent = formatINR(data.monthly_gross * 12);
+    document.getElementById('resultAnnualValue').textContent = formatINR(data.components.gross_salary);
     
     // Components
     document.getElementById('basicValue').textContent = formatINR(data.components.basic);
@@ -196,6 +204,7 @@ async function calculateInhandToCTC() {
     
     // Deductions
     document.getElementById('epfValue').textContent = formatINR(data.components.employee_pf);
+    document.getElementById('employerPFValue').textContent = formatINR(data.components.employer_pf);
     document.getElementById('ptValue').textContent = formatINR(data.components.professional_tax);
     document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
     document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
