@@ -308,6 +308,22 @@ button[type="submit"]:hover {
 .slab-row span:first-child {
   flex: 2;
 }
+/* Add this to your existing style.css */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.breakdown-list .breakdown-item {
+  padding: 8px 0;
+}
+
+/* Add to existing .breakdown-list */
+.breakdown-list .total {
+  font-weight: 700;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 5px;
+}
 
 /* Footer */
 .info-footer {
