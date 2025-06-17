@@ -45,6 +45,19 @@ header {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
+.info-box {
+  background: #e8f4f8;
+  border-left: 4px solid var(--primary);
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+}
+
+.info-box p {
+  margin: 0;
+  line-height: 1.5;
+}
 
 h1 {
   color: var(--dark);
