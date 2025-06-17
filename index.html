@@ -53,6 +53,16 @@
         <input type="number" id="otherAllowancesNormal" placeholder="e.g. 30000" value="30000" />
       </div>
       
+      <div class="form-group">
+        <label for="employeePFNormal">Employee PF (Annual, optional)</label>
+        <input type="number" id="employeePFNormal" placeholder="e.g. 50000" />
+      </div>
+      
+      <div class="form-group">
+        <label for="employerPFNormal">Employer PF (Annual, optional)</label>
+        <input type="number" id="employerPFNormal" placeholder="e.g. 50000" />
+      </div>
+      
       <button type="submit">Calculate In-hand Salary</button>
     </form>
 
@@ -79,6 +89,16 @@
       <div class="form-group">
         <label for="otherAllowancesReverse">Other Allowances (₹)</label>
         <input type="number" id="otherAllowancesReverse" placeholder="e.g. 30000" value="30000" />
+      </div>
+      
+      <div class="form-group">
+        <label for="employeePFReverse">Employee PF (Annual, optional)</label>
+        <input type="number" id="employeePFReverse" placeholder="e.g. 50000" />
+      </div>
+      
+      <div class="form-group">
+        <label for="employerPFReverse">Employer PF (Annual, optional)</label>
+        <input type="number" id="employerPFReverse" placeholder="e.g. 50000" />
       </div>
       
       <button type="submit">Calculate CTC</button>
@@ -133,6 +153,10 @@
             <div class="breakdown-item">
               <span>Employee PF</span>
               <span id="epfValue">₹21,600</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Employer PF</span>
+              <span id="employerPFValue">₹21,600</span>
             </div>
             <div class="breakdown-item">
               <span>Professional Tax</span>
