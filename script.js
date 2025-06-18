@@ -21,19 +21,6 @@ tabReverse.addEventListener('click', () => {
   resultsContainer.classList.add('hidden');
 });
 
-// Basic % slider handlers
-document.getElementById('basicPercentNormal').addEventListener('input', function() {
-  document.getElementById('basicPercentNormalValue').textContent = this.value + '%';
-});
-
-document.getElementById('hraPercentNormal').addEventListener('input', function() {
-  document.getElementById('hraPercentNormalValue').textContent = this.value + '%';
-});
-
-document.getElementById('basicPercentReverse').addEventListener('input', function() {
-  document.getElementById('basicPercentReverseValue').textContent = this.value + '%';
-});
-
 // Form submission handlers
 normalForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -78,12 +65,8 @@ function renderTaxSlabs(slabs) {
 async function calculateCTCToInhand() {
   // Get input values
   const ctc = parseFloat(document.getElementById('inputCTC').value) || 0;
-  const basicPercent = parseFloat(document.getElementById('basicPercentNormal').value) / 100;
-  const hraPercent = parseFloat(document.getElementById('hraPercentNormal').value) / 100;
   const bonus = parseFloat(document.getElementById('bonusNormal').value) || 0;
   const allowances = parseFloat(document.getElementById('otherAllowancesNormal').value) || 0;
-  const employeePF = parseFloat(document.getElementById('employeePFNormal').value) || 0;
-  const employerPF = parseFloat(document.getElementById('employerPFNormal').value) || 0;
   
   // Show loading state
   resultsContainer.classList.add('hidden');
@@ -97,12 +80,8 @@ async function calculateCTCToInhand() {
       },
       body: JSON.stringify({
         ctc: ctc,
-        basic_percent: basicPercent * 100, // convert to percentage
-        hra_percent: hraPercent * 100,
         bonus: bonus,
-        other_allowances: allowances,
-        employee_pf: employeePF,
-        employer_pf: employerPF
+        other_allowances: allowances
       })
     });
     
@@ -133,6 +112,12 @@ async function calculateCTCToInhand() {
     document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
     document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
     
+    // Employer contributions
+    document.getElementById('employerPFValue2').textContent = formatINR(data.components.employer_pf);
+    document.getElementById('gratuityValue').textContent = formatINR(data.components.gratuity);
+    document.getElementById('totalEmployerValue').textContent = formatINR(data.employer_contributions);
+    document.getElementById('ctcVerificationValue').textContent = formatINR(data.calculated_ctc);
+    
     // Tax breakdown
     const taxSlabs = data.tax_breakdown.map(item => {
       return {
@@ -145,15 +130,6 @@ async function calculateCTCToInhand() {
     renderTaxSlabs(taxSlabs);
     document.getElementById('totalTaxValue').textContent = formatINR(data.components.income_tax);
     
-    // Show CTC adjustment note if needed
-    if (Math.abs(data.calculated_ctc - ctc) > 100) {
-      const note = document.createElement('div');
-      note.className = 'info-box';
-      note.innerHTML = `<p><strong>Note:</strong> Calculated CTC is ${formatINR(data.calculated_ctc)} based on components. 
-                        Input CTC was ${formatINR(ctc)}. Difference is due to rounding and calculation method.</p>`;
-      resultsContainer.appendChild(note);
-    }
-    
     resultsContainer.classList.remove('hidden');
   } catch (error) {
     console.error('Error:', error);
@@ -165,18 +141,15 @@ async function calculateCTCToInhand() {
 async function calculateInhandToCTC() {
   // Get input values
   const monthlyInhand = parseFloat(document.getElementById('desiredSalary').value) || 0;
-  const basicPercent = parseFloat(document.getElementById('basicPercentReverse').value) / 100;
   const bonus = parseFloat(document.getElementById('bonusReverse').value) || 0;
   const allowances = parseFloat(document.getElementById('otherAllowancesReverse').value) || 0;
-  const employeePF = parseFloat(document.getElementById('employeePFReverse').value) || 0;
-  const employerPF = parseFloat(document.getElementById('employerPFReverse').value) || 0;
   
   // Show loading state
   resultsContainer.classList.add('hidden');
   document.getElementById('resultTitle').textContent = "Calculating...";
   
   try {
-    const response = await fetch('https://shuan24.pythonanywhere.com/inhand-to-ctc', {
+    const response = await fetch('/inhand-to-ctc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -184,10 +157,7 @@ async function calculateInhandToCTC() {
       body: JSON.stringify({
         monthly_inhand: monthlyInhand,
         bonus: bonus,
-        other_allowances: allowances,
-        basic_percent: basicPercent * 100, // convert to percentage
-        employee_pf: employeePF,
-        employer_pf: employerPF
+        other_allowances: allowances
       })
     });
     
@@ -218,6 +188,14 @@ async function calculateInhandToCTC() {
     document.getElementById('taxValue').textContent = formatINR(data.components.income_tax);
     document.getElementById('totalDeductionsValue').textContent = formatINR(data.total_deductions);
     
+    // Employer contributions
+    document.getElementById('employerPFValue2').textContent = formatINR(data.components.employer_pf);
+    document.getElementById('gratuityValue').textContent = formatINR(data.components.gratuity);
+    document.getElementById('totalEmployerValue').textContent = formatINR(data.employer_contributions);
+    document.getElementById('ctcVerificationValue').textContent = formatINR(
+      data.components.gross_salary + data.employer_contributions + data.components.bonus + data.components.other_allowances
+    );
+    
     // Tax breakdown
     const taxSlabs = data.tax_breakdown.map(item => {
       return {
@@ -236,8 +214,3 @@ async function calculateInhandToCTC() {
     alert('Failed to calculate CTC. Please try again.');
   }
 }
-
-// Initialize with sample values
-document.getElementById('basicPercentNormalValue').textContent = '40%';
-document.getElementById('hraPercentNormalValue').textContent = '50%';
-document.getElementById('basicPercentReverseValue').textContent = '40%';
