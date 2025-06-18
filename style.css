@@ -156,6 +156,30 @@ h1 {
   font-weight: 600;
   color: var(--primary);
 }
+/* Add to your existing CSS */
+.employer-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 25px;
+  border: 1px solid #e5e7eb;
+}
+
+.employer-section h3 {
+  font-size: 18px;
+  color: #1f2937;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eef2ff;
+}
+
+.breakdown-list .verification {
+  font-weight: 600;
+  background: #e8f4f8;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
 
 button[type="submit"] {
   width: 100%;
