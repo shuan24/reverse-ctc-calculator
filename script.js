@@ -73,7 +73,7 @@ async function calculateCTCToInhand() {
   document.getElementById('resultTitle').textContent = "Calculating...";
   
   try {
-    const response = await fetch('/ctc-to-inhand', {
+    const response = await fetch('https://shuan24.pythonanywhere.com/ctc-to-inhand', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -149,7 +149,7 @@ async function calculateInhandToCTC() {
   document.getElementById('resultTitle').textContent = "Calculating...";
   
   try {
-    const response = await fetch('/inhand-to-ctc', {
+    const response = await fetch('https://shuan24.pythonanywhere.com/inhand-to-ctc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
