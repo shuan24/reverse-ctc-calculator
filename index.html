@@ -28,22 +28,6 @@
       </div>
       
       <div class="form-group">
-        <label for="basicPercentNormal">Basic Salary % of CTC</label>
-        <div class="slider-container">
-          <input type="range" id="basicPercentNormal" min="30" max="70" value="40" step="1" />
-          <span id="basicPercentNormalValue">40%</span>
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="hraPercentNormal">HRA % of Basic</label>
-        <div class="slider-container">
-          <input type="range" id="hraPercentNormal" min="0" max="100" value="50" step="1" />
-          <span id="hraPercentNormalValue">50%</span>
-        </div>
-      </div>
-      
-      <div class="form-group">
         <label for="bonusNormal">Annual Bonus (₹)</label>
         <input type="number" id="bonusNormal" placeholder="e.g. 50000" value="50000" />
       </div>
@@ -51,16 +35,6 @@
       <div class="form-group">
         <label for="otherAllowancesNormal">Other Allowances (₹)</label>
         <input type="number" id="otherAllowancesNormal" placeholder="e.g. 30000" value="30000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="employeePFNormal">Employee PF (Annual, optional)</label>
-        <input type="number" id="employeePFNormal" placeholder="e.g. 50000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="employerPFNormal">Employer PF (Annual, optional)</label>
-        <input type="number" id="employerPFNormal" placeholder="e.g. 50000" />
       </div>
       
       <button type="submit">Calculate In-hand Salary</button>
@@ -74,14 +48,6 @@
       </div>
       
       <div class="form-group">
-        <label for="basicPercentReverse">Basic Salary % of CTC</label>
-        <div class="slider-container">
-          <input type="range" id="basicPercentReverse" min="30" max="70" value="40" step="1" />
-          <span id="basicPercentReverseValue">40%</span>
-        </div>
-      </div>
-      
-      <div class="form-group">
         <label for="bonusReverse">Annual Bonus (₹)</label>
         <input type="number" id="bonusReverse" placeholder="e.g. 50000" value="50000" />
       </div>
@@ -89,16 +55,6 @@
       <div class="form-group">
         <label for="otherAllowancesReverse">Other Allowances (₹)</label>
         <input type="number" id="otherAllowancesReverse" placeholder="e.g. 30000" value="30000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="employeePFReverse">Employee PF (Annual, optional)</label>
-        <input type="number" id="employeePFReverse" placeholder="e.g. 50000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="employerPFReverse">Employer PF (Annual, optional)</label>
-        <input type="number" id="employerPFReverse" placeholder="e.g. 50000" />
       </div>
       
       <button type="submit">Calculate CTC</button>
@@ -125,11 +81,11 @@
           <h3>Salary Components</h3>
           <div class="breakdown-list">
             <div class="breakdown-item">
-              <span>Basic Salary</span>
+              <span>Basic Salary (50% of CTC)</span>
               <span id="basicValue">₹4,80,000</span>
             </div>
             <div class="breakdown-item">
-              <span>HRA</span>
+              <span>HRA (50% of Basic)</span>
               <span id="hraValue">₹2,40,000</span>
             </div>
             <div class="breakdown-item">
@@ -148,7 +104,7 @@
         </div>
         
         <div class="results-section">
-          <h3>Deductions</h3>
+          <h3>Deductions & Contributions</h3>
           <div class="breakdown-list">
             <div class="breakdown-item">
               <span>Employee PF</span>
@@ -170,6 +126,28 @@
               <span>Total Deductions</span>
               <span id="totalDeductionsValue">₹2,25,800</span>
             </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="employer-section">
+        <h3>Employer Contributions</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-item">
+            <span>Employer PF</span>
+            <span id="employerPFValue2">₹21,600</span>
+          </div>
+          <div class="breakdown-item">
+            <span>Gratuity</span>
+            <span id="gratuityValue">₹23,077</span>
+          </div>
+          <div class="breakdown-item total">
+            <span>Total Employer Contributions</span>
+            <span id="totalEmployerValue">₹44,677</span>
+          </div>
+          <div class="breakdown-item verification">
+            <span>CTC Verification (Gross Salary + Contributions)</span>
+            <span id="ctcVerificationValue">₹12,44,677</span>
           </div>
         </div>
       </div>
@@ -200,7 +178,7 @@
     <p>
       <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br />
       Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic (capped at ₹15,000/month)<br />
-      Gratuity = (15/26) × Basic per month
+      Basic = 50% of CTC | HRA = 50% of Basic | Gratuity = (15/26) × Basic per month
     </p>
   </footer>
 
