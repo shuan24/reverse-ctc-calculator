@@ -123,3 +123,13 @@ th {
     border-radius: 8px;
     margin-top: 20px;
 }
+/* Add to existing styles */
+#chartContainer {
+    margin-top: 30px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
