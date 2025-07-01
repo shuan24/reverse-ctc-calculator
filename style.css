@@ -123,3 +123,32 @@ th {
     border-radius: 8px;
     margin-top: 20px;
 }
+.clarification-box {
+    background: #e0f2fe;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid #0ea5e9;
+    margin-bottom: 20px;
+}
+
+.clarification-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.clarify-btn {
+    flex: 1;
+    padding: 10px 15px;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.clarify-btn:hover {
+    background: #0284c7;
+}
