@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Salary Guru - CTC aur In-hand Calculator</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -27,6 +28,9 @@
                 <tbody></tbody>
             </table>
             <div id="tips"></div>
+            <div id="chartContainer" class="hidden">
+                <canvas id="salaryChart"></canvas>
+            </div>
         </div>
         
         <div id="loader" class="hidden">Calculating... <div class="spinner"></div></div>
