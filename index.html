@@ -2,11 +2,9 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salary Guru - CTC aur In-hand Calculator</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -17,9 +15,6 @@
             <input type="text" id="userInput" placeholder="Example: 12L ka CTC kitna in-hand? ya 90k monthly chahiye" autocomplete="off">
             <button id="calculateBtn">Calculate Karo!</button>
         </div>
-        
-        <!-- Debug Container -->
-        <div id="debugContainer" style="color: red; margin-top: 20px;"></div>
         
         <div id="resultContainer" class="hidden">
             <div id="summary"></div>
@@ -33,9 +28,6 @@
                 <tbody></tbody>
             </table>
             <div id="tips"></div>
-            <div id="chartContainer" class="hidden">
-                <canvas id="salaryChart"></canvas>
-            </div>
         </div>
         
         <div id="loader" class="hidden">Calculating... <div class="spinner"></div></div>
