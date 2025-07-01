@@ -61,11 +61,87 @@ document.addEventListener('DOMContentLoaded', () => {
             data.tips.map(tip => `<li>${tip}</li>`).join('')
         }</ul>`;
         
-        // Handle chart/PDF request
+        // Handle chart request
+        const chartContainer = document.getElementById('chartContainer');
         if (data.chart_requested) {
-            tipsDiv.innerHTML += `<p>📊 Chart ban raha hai — ek second! 👇</p>`;
-            // Chart generation would go here
+            chartContainer.classList.remove('hidden');
+            createSalaryChart(data.breakdown);
+        } else {
+            chartContainer.classList.add('hidden');
         }
+    }
+
+    function createSalaryChart(breakdown) {
+        const ctx = document.getElementById('salaryChart').getContext('2d');
+        
+        // Destroy existing chart if any
+        if (window.salaryChart) {
+            window.salaryChart.destroy();
+        }
+        
+        // Prepare chart data
+        const labels = [];
+        const amounts = [];
+        const backgroundColors = [];
+        
+        breakdown.forEach(item => {
+            // Only include significant components
+            if (Math.abs(item.amount) > 1000) {
+                labels.push(item.component);
+                amounts.push(Math.abs(item.amount));
+                
+                // Assign colors based on component type
+                if (item.amount < 0) {
+                    backgroundColors.push('#ef4444'); // Red for deductions
+                } else if (item.component.includes('HRA')) {
+                    backgroundColors.push('#3b82f6'); // Blue for HRA
+                } else if (item.component.includes('Basic')) {
+                    backgroundColors.push('#10b981'); // Green for Basic
+                } else if (item.component.includes('PF')) {
+                    backgroundColors.push('#8b5cf6'); // Purple for PF
+                } else {
+                    backgroundColors.push('#f59e0b'); // Yellow for others
+                }
+            }
+        });
+        
+        // Create chart
+        window.salaryChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: amounts,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                return `${label}: ₹${value.toLocaleString('en-IN')}`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Salary Breakdown',
+                        font: {
+                            size: 16
+                        }
+                    }
+                }
+            }
+        });
+    }
     }
 
     function showError(message) {
