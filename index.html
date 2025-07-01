@@ -1,187 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Indian CTC ↔ In-hand Calculator (FY 2025-26)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Salary Guru - CTC aur In-hand Calculator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Indian CTC ↔ In-hand Salary Calculator</h1>
-      <p class="subtitle">FY 2025-26 (New Tax Regime)</p>
-    </header>
-
-    <!-- Tab Switcher -->
-    <div class="tab-buttons">
-      <button id="tabCTC" class="active-tab">CTC → In-hand</button>
-      <button id="tabReverse">In-hand → CTC</button>
-    </div>
-
-    <!-- CTC → In-hand Calculator -->
-    <form id="normalForm">
-      <div class="form-group">
-        <label for="inputCTC">Annual CTC (₹)</label>
-        <input type="number" id="inputCTC" placeholder="e.g. 1500000" required value="1200000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="bonusNormal">Annual Bonus (₹)</label>
-        <input type="number" id="bonusNormal" placeholder="e.g. 50000" value="50000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="otherAllowancesNormal">Other Allowances (₹)</label>
-        <input type="number" id="otherAllowancesNormal" placeholder="e.g. 30000" value="30000" />
-      </div>
-      
-      <button type="submit">Calculate In-hand Salary</button>
-    </form>
-
-    <!-- In-hand → CTC Calculator -->
-    <form id="salaryForm" style="display: none;">
-      <div class="form-group">
-        <label for="desiredSalary">Monthly In-hand Salary (₹)</label>
-        <input type="number" id="desiredSalary" placeholder="e.g. 80000" required value="75000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="bonusReverse">Annual Bonus (₹)</label>
-        <input type="number" id="bonusReverse" placeholder="e.g. 50000" value="50000" />
-      </div>
-      
-      <div class="form-group">
-        <label for="otherAllowancesReverse">Other Allowances (₹)</label>
-        <input type="number" id="otherAllowancesReverse" placeholder="e.g. 30000" value="30000" />
-      </div>
-      
-      <button type="submit">Calculate CTC</button>
-    </form>
-
-    <!-- Results Container -->
-    <div id="resultsContainer" class="hidden">
-      <div class="results-header">
-        <h2 id="resultTitle">Salary Breakdown</h2>
-        <div class="result-summary">
-          <div class="result-card">
-            <h3 id="resultMainTitle">Monthly In-hand</h3>
-            <div class="value" id="resultMainValue">₹72,850</div>
-          </div>
-          <div class="result-card">
-            <h3>Annual Equivalent</h3>
-            <div class="value" id="resultAnnualValue">₹8,74,200</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="results-grid">
-        <div class="results-section">
-          <h3>Salary Components</h3>
-          <div class="breakdown-list">
-            <div class="breakdown-item">
-              <span>Basic Salary (50% of CTC)</span>
-              <span id="basicValue">₹4,80,000</span>
-            </div>
-            <div class="breakdown-item">
-              <span>HRA (50% of Basic)</span>
-              <span id="hraValue">₹2,40,000</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Bonus</span>
-              <span id="bonusValue">₹50,000</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Other Allowances</span>
-              <span id="allowancesValue">₹30,000</span>
-            </div>
-            <div class="breakdown-item total">
-              <span>Gross Salary</span>
-              <span id="grossValue">₹8,00,000</span>
-            </div>
-          </div>
+    <div class="container">
+        <h1>🤑 Salary Guru</h1>
+        <p class="subtitle">CTC aur In-hand Salary Calculator (New Tax Regime)</p>
+        
+        <div class="input-section">
+            <input type="text" id="userInput" placeholder="Example: 12L ka CTC kitna in-hand? ya 90k monthly chahiye" autocomplete="off">
+            <button id="calculateBtn">Calculate Karo!</button>
         </div>
         
-        <div class="results-section">
-          <h3>Deductions & Contributions</h3>
-          <div class="breakdown-list">
-            <div class="breakdown-item">
-              <span>Employee PF</span>
-              <span id="epfValue">₹21,600</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Employer PF</span>
-              <span id="employerPFValue">₹21,600</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Professional Tax</span>
-              <span id="ptValue">₹2,400</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Income Tax</span>
-              <span id="taxValue">₹1,01,800</span>
-            </div>
-            <div class="breakdown-item total">
-              <span>Total Deductions</span>
-              <span id="totalDeductionsValue">₹2,25,800</span>
-            </div>
-          </div>
+        <div id="resultContainer" class="hidden">
+            <div id="summary"></div>
+            <table id="breakdownTable">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Amount (Monthly)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="tips"></div>
         </div>
-      </div>
-      
-      <div class="employer-section">
-        <h3>Employer Contributions</h3>
-        <div class="breakdown-list">
-          <div class="breakdown-item">
-            <span>Employer PF</span>
-            <span id="employerPFValue2">₹21,600</span>
-          </div>
-          <div class="breakdown-item">
-            <span>Gratuity</span>
-            <span id="gratuityValue">₹23,077</span>
-          </div>
-          <div class="breakdown-item total">
-            <span>Total Employer Contributions</span>
-            <span id="totalEmployerValue">₹44,677</span>
-          </div>
-          <div class="breakdown-item verification">
-            <span>CTC Verification (Gross Salary + Contributions)</span>
-            <span id="ctcVerificationValue">₹12,44,677</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="tax-section">
-        <h3>Income Tax Breakdown (New Regime)</h3>
-        <div class="tax-slab-container">
-          <div class="slab-row header">
-            <span>Income Slab</span>
-            <span>Rate</span>
-            <span>Tax Amount</span>
-          </div>
-          <div id="taxSlabsContainer">
-            <!-- Tax slabs will be inserted here dynamically -->
-          </div>
-          <div class="slab-row total">
-            <span>Total Tax</span>
-            <span></span>
-            <span id="totalTaxValue">₹1,05,872</span>
-          </div>
-        </div>
-      </div>
+        
+        <div id="loader" class="hidden">Calculating... <div class="spinner"></div></div>
+        <div id="errorContainer" class="hidden"></div>
     </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="info-footer">
-    <p>
-      <strong>Note:</strong> Calculations based on India's new tax regime for FY 2025-26<br />
-      Professional Tax: ₹200/month | Standard Deduction: ₹75,000 | Employee PF: 12% of Basic (capped at ₹15,000/month)<br />
-      Basic = 50% of CTC | HRA = 50% of Basic | Gratuity = (15/26) × Basic per month
-    </p>
-  </footer>
-
-  <script src="script.js"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
