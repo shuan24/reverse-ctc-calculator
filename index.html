@@ -2,36 +2,36 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>Salary Guru - CTC aur In-hand Calculator</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Salary Calculator - CTC aur In-hand Converter</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>🤑 Salary Guru</h1>
-        <p class="subtitle">CTC aur In-hand Salary Calculator (New Tax Regime)</p>
-        
-        <div class="input-section">
-            <input type="text" id="userInput" placeholder="Example: 12L ka CTC kitna in-hand? ya 90k monthly chahiye" autocomplete="off">
-            <button id="calculateBtn">Calculate Karo!</button>
+        <h1>🇮🇳 India Salary Calculator</h1>
+        <div class="card">
+            <div class="card-header">
+                <h2>CTC ↔️ In-hand Salary Converter</h2>
+                <p>New Tax Regime (FY 2025-26) ke hisab se calculate kare</p>
+            </div>
+            
+            <div class="input-section">
+                <input type="text" id="queryInput" 
+                       placeholder="Example: '12 LPA CTC kitna in-hand hoga?' or '₹90,000/month in-hand ke liye kitna CTC chahiye?'">
+                <button onclick="calculate()">Calculate</button>
+            </div>
+            
+            <div id="result" class="result-section"></div>
         </div>
         
-        <div id="resultContainer" class="hidden">
-            <div id="summary"></div>
-            <table id="breakdownTable">
-                <thead>
-                    <tr>
-                        <th>Component</th>
-                        <th>Amount (Monthly)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <div id="tips"></div>
+        <div class="tax-info">
+            <h3>New Tax Regime (FY 2025-26) Highlights:</h3>
+            <ul>
+                <li>Standard Deduction: ₹75,000</li>
+                <li>Tax Rebate (Section 87A): Up to ₹60,000</li>
+                <li>No tax on income up to ₹12,00,000</li>
+            </ul>
         </div>
-        
-        <div id="loader" class="hidden">Calculating... <div class="spinner"></div></div>
-        <div id="errorContainer" class="hidden"></div>
     </div>
     
     <script src="script.js"></script>
