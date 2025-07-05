@@ -1,207 +1,117 @@
+:root {
+    --primary: #2563eb;
+    --secondary: #059669;
+    --background: #f3f4f6;
+    --card: #ffffff;
+    --text: #1f2937;
+    --border: #d1d5db;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f7fa;
+    margin: 0;
     padding: 20px;
+}
+
+.container {
     max-width: 800px;
     margin: 0 auto;
 }
 
-.container {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-h1 {
-    color: #2563eb;
-    text-align: center;
-}
-
-.subtitle {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 30px;
-}
-
-.input-section {
-    display: flex;
-    gap: 10px;
+.card {
+    background-color: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
     margin-bottom: 20px;
 }
 
-#userInput {
+.card-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 20px;
+}
+
+.input-section {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+#queryInput {
     flex: 1;
     padding: 12px 15px;
-    border: 2px solid #cbd5e1;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 16px;
 }
 
-#calculateBtn {
-    background: #2563eb;
+button {
+    background-color: var(--secondary);
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 0 25px;
+    padding: 12px 24px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-#calculateBtn:hover {
-    background: #1d4ed8;
-}
-
-#resultContainer {
-    margin-top: 30px;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 20px;
-}
-
-#summary {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #0f172a;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 25px;
-}
-
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-th {
-    background-color: #f1f5f9;
-    color: #475569;
-}
-
-#tips {
-    background: #fffbeb;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #f59e0b;
-}
-
-.hidden {
-    display: none;
-}
-
-#loader {
-    text-align: center;
-    padding: 20px;
-    color: #64748b;
-}
-
-.spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: #2563eb;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 10px auto;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-#errorContainer {
-    color: #dc2626;
-    background: #fef2f2;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px;
-}
-.clarification-box {
-    background: #e0f2fe;
-    padding: 20px;
-    border-radius: 10px;
-    border-left: 4px solid #0ea5e9;
-    margin-bottom: 20px;
-}
-
-/* Clarification Box */
-.clarification-box {
-    background: #e0f2fe;
-    padding: 20px;
-    border-radius: 10px;
-    border-left: 4px solid #0ea5e9;
-    margin-bottom: 20px;
-}
-
-.clarification-options {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.clarify-btn {
-    flex: 1;
-    padding: 10px 15px;
-    background: #0ea5e9;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.clarify-btn:hover {
-    background: #0284c7;
-}
-
-/* Chart Container */
-#chartContainer {
-    margin-top: 30px;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 15px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-/* PDF Button */
-.pdf-btn {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background: #10b981;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 600;
     transition: background-color 0.3s;
 }
 
-.pdf-btn:hover {
-    background: #059669;
+button:hover {
+    background-color: #047857;
 }
 
-/* Responsive Table */
+.result-section {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.result-card {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.tax-info {
+    background-color: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.salary-breakdown {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.salary-breakdown th {
+    background-color: #e5e7eb;
+    text-align: left;
+    padding: 12px;
+}
+
+.salary-breakdown td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.salary-breakdown tr:last-child td {
+    border-bottom: none;
+}
+
+.highlight {
+    font-weight: 700;
+    color: var(--primary);
+}
+
 @media (max-width: 600px) {
     .input-section {
         flex-direction: column;
-    }
-    
-    table {
-        font-size: 14px;
-    }
-    
-    #chartContainer {
-        padding: 10px;
     }
 }
